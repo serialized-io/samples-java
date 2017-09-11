@@ -8,7 +8,7 @@ mvn clean install
 
 ## Event Feed API
 
-Start by opening one terminal windows and copy/paste the commands below.
+Start by opening one terminal window and copy/paste the commands below.
 
 ```
 export SERIALIZED_ACCESS_KEY=<your-access-key>
@@ -21,7 +21,7 @@ You are now ready to store some events so keep reading!
 
 ## Event Sourcing API
 
-Open a second terminal windows and copy/paste the commands below.
+Open a second terminal window and copy/paste the commands below.
 
 ```
 export SERIALIZED_ACCESS_KEY=<your-access-key>
