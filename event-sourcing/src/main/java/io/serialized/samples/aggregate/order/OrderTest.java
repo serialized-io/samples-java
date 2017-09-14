@@ -1,25 +1,30 @@
 package io.serialized.samples.aggregate.order;
 
+import io.serialized.samples.aggregate.order.client.DefaultOrderClient;
 import io.serialized.samples.aggregate.order.client.OrderClient;
 import io.serialized.samples.aggregate.order.event.OrderCancelledEvent;
 import io.serialized.samples.aggregate.order.event.OrderPaidEvent;
 import io.serialized.samples.aggregate.order.event.OrderPlacedEvent;
+import io.serialized.samples.aggregate.order.event.OrderShippedEvent;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Optional;
 import java.util.UUID;
+
+import static org.apache.commons.lang.StringUtils.defaultString;
 
 public class OrderTest {
 
   private static final URI EVENT_API_URI = URI.create("https://api.serialized.io/aggregates");
 
   public static void main(String[] args) throws IOException {
-    String accessKey = System.getenv("SERIALIZED_ACCESS_KEY");
-    String secretAccessKey = System.getenv("SERIALIZED_SECRET_ACCESS_KEY");
+    String accessKey = getConfig("SERIALIZED_ACCESS_KEY");
+    String secretAccessKey = getConfig("SERIALIZED_SECRET_ACCESS_KEY");
 
     System.out.format("Connecting to [%s] using [%s]\n", EVENT_API_URI, accessKey);
 
-    OrderClient orderClient = new OrderClient(EVENT_API_URI, accessKey, secretAccessKey);
+    OrderClient orderClient = new DefaultOrderClient(EVENT_API_URI, accessKey, secretAccessKey);
 
     // ======================================================================================================
 
@@ -31,6 +36,8 @@ public class OrderTest {
     OrderPlacedEvent orderPlacedEvent = order.place("someCustomerId1", 4321);
     System.out.println("Placing order: " + orderId1);
     orderClient.saveEvent(orderInitState.aggregateId, orderInitState.version, orderPlacedEvent);
+
+    // --------------
 
     // Load..
     OrderState orderToCancelState = orderClient.load(orderId1);
@@ -51,6 +58,8 @@ public class OrderTest {
     System.out.println("Placing order: " + orderId2);
     orderClient.saveEvent(orderInitState1.aggregateId, orderInitState1.version, orderPlacedEvent1);
 
+    // --------------
+
     // Load..
     OrderState orderToPayState = orderClient.load(orderId2);
     Order orderToPay = new Order(orderToPayState);
@@ -59,8 +68,23 @@ public class OrderTest {
     System.out.println("Paying order: " + orderId2);
     orderClient.saveEvent(orderToPayState.aggregateId, orderToPayState.version, orderPaidEvent);
 
+    // --------------
+
+    // Load..
+    OrderState orderToShipState = orderClient.load(orderId2);
+    Order orderToShip = new Order(orderToShipState);
+    // ..and ship order
+    OrderShippedEvent orderShippedEvent = orderToShip.ship("abc-123");
+    System.out.println("Shipping order: " + orderId2);
+    orderClient.saveEvent(orderToShipState.aggregateId, orderToShipState.version, orderShippedEvent);
+
     // ======================================================================================================
 
+  }
+
+  private static String getConfig(String key) {
+    return Optional.ofNullable(defaultString(System.getenv(key), System.getProperty(key)))
+        .orElseThrow(() -> new IllegalStateException("Missing environment property: " + key));
   }
 
 }
