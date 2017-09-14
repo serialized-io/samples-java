@@ -21,7 +21,8 @@ import static org.apache.commons.lang.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 @JsonSubTypes({
     @JsonSubTypes.Type(OrderPlacedEvent.class),
     @JsonSubTypes.Type(OrderPaidEvent.class),
-    @JsonSubTypes.Type(OrderCancelledEvent.class)
+    @JsonSubTypes.Type(OrderCancelledEvent.class),
+    @JsonSubTypes.Type(OrderShippedEvent.class)
 })
 public abstract class AbstractOrderEvent implements Serializable {
 

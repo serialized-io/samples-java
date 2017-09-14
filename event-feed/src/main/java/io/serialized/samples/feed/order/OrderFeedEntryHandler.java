@@ -14,15 +14,19 @@ public class OrderFeedEntryHandler implements FeedEntryHandler {
     for (Feed.FeedEntry.Event event : feedEntry.events) {
       switch (event.eventType) {
         case "OrderPlacedEvent": {
-          System.out.println(format("An order with ID [%s] was placed by [%s]", feedEntry.aggregateId, event.data.get("customerId")));
+          System.out.println(format("An order with ID [%s] was placed by customer [%s]", feedEntry.aggregateId, event.data.get("customerId")));
           break;
         }
         case "OrderPaidEvent": {
-          System.out.println(format("The order with ID [%s] was paid", feedEntry.aggregateId));
+          System.out.println(format("The order with ID [%s] was paid, amount: %s", feedEntry.aggregateId, event.data.get("amount")));
+          break;
+        }
+        case "OrderShippedEvent": {
+          System.out.println(format("The order with ID [%s] was shipped, trackingNumber: %s", feedEntry.aggregateId, event.data.get("trackingNumber")));
           break;
         }
         case "OrderCancelledEvent": {
-          System.out.println(format("The order with ID [%s] was cancelled", feedEntry.aggregateId));
+          System.out.println(format("The order with ID [%s] was cancelled, reason: %s", feedEntry.aggregateId, event.data.get("reason")));
           break;
         }
         default:
