@@ -1,8 +1,10 @@
 package io.serialized.samples.aggregate.order;
 
+import io.serialized.samples.aggregate.order.OrderState.OrderStatus;
 import io.serialized.samples.aggregate.order.event.OrderCancelledEvent;
 import io.serialized.samples.aggregate.order.event.OrderPaidEvent;
 import io.serialized.samples.aggregate.order.event.OrderPlacedEvent;
+import io.serialized.samples.aggregate.order.event.OrderShippedEvent;
 
 public class Order {
 
@@ -19,33 +21,30 @@ public class Order {
 
   public OrderPaidEvent pay(long amount) {
     assertPlaced();
-    assertNotCancelled();
-    assertNotPaid();
     assertAcceptedAmount(amount);
-    return new OrderPaidEvent();
+    return new OrderPaidEvent(amount);
+  }
+
+  public OrderShippedEvent ship(String trackingNumber) {
+    assertPaid();
+    return new OrderShippedEvent(trackingNumber);
   }
 
   public OrderCancelledEvent cancel(String reason) {
     assertPlaced();
-    assertNotCancelled();
-    assertNotPaid();
     return new OrderCancelledEvent(reason);
   }
 
-  private void assertPlaced() {
-    if (state.orderStatus != OrderState.OrderStatus.PLACED) throw new IllegalStateException("Order not placed!");
-  }
-
   private void assertNotYetPlaced() {
-    if (state.orderStatus != OrderState.OrderStatus.NEW) throw new IllegalStateException("Order already placed! ");
+    if (state.orderStatus != OrderStatus.NEW) throw new IllegalStateException("Expected order to be NEW!");
   }
 
-  private void assertNotCancelled() {
-    if (state.orderStatus == OrderState.OrderStatus.CANCELLED) throw new IllegalStateException("Order is cancelled!");
+  private void assertPlaced() {
+    if (state.orderStatus != OrderStatus.PLACED) throw new IllegalStateException("Expected order to be PLACED!");
   }
 
-  private void assertNotPaid() {
-    if (state.paid) throw new IllegalStateException("Order is already paid!");
+  private void assertPaid() {
+    if (state.orderStatus != OrderStatus.PAID) throw new IllegalStateException("Expected order to be PAID!");
   }
 
   private void assertAcceptedAmount(long amount) {
