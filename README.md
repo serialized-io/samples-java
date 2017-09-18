@@ -1,6 +1,20 @@
 # Java samples for Serialized.io
 
-Clone this repository and build using Maven 
+
+## Request API-keys
+
+[Sign up](https://serialized.io/) to get your free API-keys to [Serialized.io](https://serialized.io).
+
+
+## Clone and build
+
+Clone this git repository
+
+```
+git clone https://bitbucket.org/serialized-io/samples-java.git
+```
+
+Build using Maven 
 
 ```
 mvn clean install
