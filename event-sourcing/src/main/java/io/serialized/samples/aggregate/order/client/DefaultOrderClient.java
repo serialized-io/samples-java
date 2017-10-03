@@ -34,8 +34,7 @@ public class DefaultOrderClient implements OrderClient {
 
   @Override
   public void saveEvent(String aggregateId, Integer expectedVersion, AbstractOrderEvent event) {
-    EventBatch eventBatch = newEventBatch(aggregateId, expectedVersion, Collections.singletonList(event));
-    assertSuccessful(doPost(eventBatch));
+    assertSuccessful(doPost(newEventBatch(aggregateId, expectedVersion, Collections.singletonList(event))));
   }
 
   @Override
