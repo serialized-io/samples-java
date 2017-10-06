@@ -32,20 +32,20 @@ public class OrderState {
     trackingNumber = builder.trackingNumber;
   }
 
-  public static OrderState loadFromEvents(String aggregateId, Integer version, List<OrderEvent> events) {
-    Builder builder = OrderState.builder(aggregateId, version);
+  public static OrderState loadFromEvents(String orderId, Integer version, List<OrderEvent> events) {
+    Builder builder = OrderState.builder(orderId, version);
     for (OrderEvent event : events) {
       event.apply(builder);
     }
     return builder.build();
   }
 
-  public static Builder builder(OrderId aggregateId) {
-    return new Builder(aggregateId.id.toString(), 0);
+  public static Builder builder(OrderId orderId) {
+    return new Builder(orderId.id.toString(), 0);
   }
 
-  public static Builder builder(String aggregateId, Integer version) {
-    return new Builder(aggregateId, version);
+  public static Builder builder(String orderId, Integer version) {
+    return new Builder(orderId, version);
   }
 
   public static class Builder {
