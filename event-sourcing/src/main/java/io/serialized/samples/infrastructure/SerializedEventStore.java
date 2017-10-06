@@ -1,7 +1,8 @@
-package io.serialized.samples.aggregate.order.store;
+package io.serialized.samples.infrastructure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import io.serialized.samples.aggregate.EventStore;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -15,7 +16,7 @@ import java.util.UUID;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
-public abstract class SerializedEventStore<E, T, A extends SerializedEventStore.Aggregate<E>> {
+public abstract class SerializedEventStore<E, T, A extends SerializedEventStore.Aggregate<E>> implements EventStore<E, T> {
 
   private static final String SERIALIZED_ACCESS_KEY = "Serialized-Access-Key";
   private static final String SERIALIZED_SECRET_ACCESS_KEY = "Serialized-Secret-Access-Key";
@@ -37,6 +38,7 @@ public abstract class SerializedEventStore<E, T, A extends SerializedEventStore.
     this.aggregateClass = aggregateClass;
   }
 
+  @Override
   public T load(UUID aggregateId) {
     System.out.println("Loading aggregate with ID: " + aggregateId);
     Invocation.Builder builder = client.target(eventStoreUri).path(aggregateType).path(aggregateId.toString()).request();
@@ -44,8 +46,7 @@ public abstract class SerializedEventStore<E, T, A extends SerializedEventStore.
     return loadFromEvents(aggregate.aggregateId, aggregate.aggregateVersion, aggregate.events);
   }
 
-  protected abstract T loadFromEvents(String aggregateId, Integer aggregateVersion, List<E> events);
-
+  @Override
   public void saveEvent(String aggregateId, Integer expectedVersion, E event) {
     List<E> events = Collections.singletonList(event);
     doPost(newEventBatch(aggregateId, expectedVersion, events));
@@ -69,13 +70,13 @@ public abstract class SerializedEventStore<E, T, A extends SerializedEventStore.
     return builder.header(SERIALIZED_ACCESS_KEY, accessKey).header(SERIALIZED_SECRET_ACCESS_KEY, secretAccessKey);
   }
 
-  static class Aggregate<E> {
+  public static class Aggregate<E> {
     public String aggregateId;
     public Integer aggregateVersion;
     public List<E> events;
   }
 
-  static class EventBatch<E> {
+  public static class EventBatch<E> {
     public String aggregateId;
     public Integer expectedVersion;
     public List<E> events;

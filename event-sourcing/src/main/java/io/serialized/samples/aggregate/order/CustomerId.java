@@ -1,5 +1,7 @@
 package io.serialized.samples.aggregate.order;
 
+import io.serialized.samples.aggregate.ValueObject;
+
 import java.util.UUID;
 import java.util.regex.Pattern;
 

@@ -1,4 +1,4 @@
-package io.serialized.samples.aggregate.order;
+package io.serialized.samples.aggregate;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
