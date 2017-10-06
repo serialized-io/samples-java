@@ -5,7 +5,7 @@ import io.serialized.samples.aggregate.order.TrackingNumber;
 
 import java.io.Serializable;
 
-public class OrderShippedEvent extends AbstractOrderEvent {
+public class OrderShippedEvent extends OrderEvent {
 
   public Data data = new Data();
 

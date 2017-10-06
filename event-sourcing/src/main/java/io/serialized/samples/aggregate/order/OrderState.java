@@ -32,9 +32,9 @@ public class OrderState {
     trackingNumber = builder.trackingNumber;
   }
 
-  public static OrderState loadFromEvents(String aggregateId, Integer version, List<AbstractOrderEvent> events) {
+  public static OrderState loadFromEvents(String aggregateId, Integer version, List<OrderEvent> events) {
     Builder builder = OrderState.builder(aggregateId, version);
-    for (AbstractOrderEvent event : events) {
+    for (OrderEvent event : events) {
       event.apply(builder);
     }
     return builder.build();

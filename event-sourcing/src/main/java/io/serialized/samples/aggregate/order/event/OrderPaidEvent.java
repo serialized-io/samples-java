@@ -5,7 +5,7 @@ import io.serialized.samples.aggregate.order.OrderState;
 
 import java.io.Serializable;
 
-public class OrderPaidEvent extends AbstractOrderEvent {
+public class OrderPaidEvent extends OrderEvent {
 
   public Data data = new Data();
 

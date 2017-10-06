@@ -24,7 +24,7 @@ import static org.apache.commons.lang.builder.ToStringStyle.SHORT_PREFIX_STYLE;
     @JsonSubTypes.Type(OrderCancelledEvent.class),
     @JsonSubTypes.Type(OrderShippedEvent.class)
 })
-public abstract class AbstractOrderEvent implements Serializable {
+public abstract class OrderEvent implements Serializable {
 
   /**
    * Auto generated event ID.

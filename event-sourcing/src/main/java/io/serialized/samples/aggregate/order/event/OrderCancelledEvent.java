@@ -4,7 +4,7 @@ import io.serialized.samples.aggregate.order.OrderState;
 
 import java.io.Serializable;
 
-public class OrderCancelledEvent extends AbstractOrderEvent {
+public class OrderCancelledEvent extends OrderEvent {
 
   public Data data = new Data();
 
