@@ -4,7 +4,7 @@ import io.serialized.samples.aggregate.order.event.OrderCancelledEvent;
 import io.serialized.samples.aggregate.order.event.OrderPaidEvent;
 import io.serialized.samples.aggregate.order.event.OrderPlacedEvent;
 import io.serialized.samples.aggregate.order.event.OrderShippedEvent;
-import io.serialized.samples.infrastructure.order.SerializedOrderEventStore;
+import io.serialized.samples.infrastructure.order.SerializedOrderEventService;
 
 import java.io.IOException;
 import java.net.URI;
@@ -25,7 +25,7 @@ public class OrderTest {
 
     System.out.format("Connecting to [%s] using [%s]\n", EVENT_API_URI, accessKey);
 
-    OrderEventStore orderEventStore = new SerializedOrderEventStore(EVENT_API_URI, accessKey, secretAccessKey);
+    OrderEventService orderEventStore = new SerializedOrderEventService(EVENT_API_URI, accessKey, secretAccessKey);
 
     // ======================================================================================================
 

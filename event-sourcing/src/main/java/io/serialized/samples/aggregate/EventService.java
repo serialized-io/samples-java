@@ -3,7 +3,7 @@ package io.serialized.samples.aggregate;
 import java.util.List;
 import java.util.UUID;
 
-public interface EventStore<E, T> {
+public interface EventService<E, T> {
 
   T load(UUID aggregateId);
 

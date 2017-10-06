@@ -2,7 +2,7 @@ package io.serialized.samples.infrastructure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import io.serialized.samples.aggregate.EventStore;
+import io.serialized.samples.aggregate.EventService;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -16,7 +16,10 @@ import java.util.UUID;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
-public abstract class SerializedEventStore<E, T, A extends SerializedEventStore.Aggregate<E>> implements EventStore<E, T> {
+/**
+ * Event store implementation for Serialized IO Event Sourcing API.
+ */
+public abstract class SerializedEventService<E, T, A extends SerializedEventService.Aggregate<E>> implements EventService<E, T> {
 
   private static final String SERIALIZED_ACCESS_KEY = "Serialized-Access-Key";
   private static final String SERIALIZED_SECRET_ACCESS_KEY = "Serialized-Secret-Access-Key";
@@ -30,7 +33,7 @@ public abstract class SerializedEventStore<E, T, A extends SerializedEventStore.
   private final String secretAccessKey;
   private final Class<A> aggregateClass;
 
-  public SerializedEventStore(String aggregateType, URI eventStoreUri, String accessKey, String secretAccessKey, Class<A> aggregateClass) {
+  public SerializedEventService(String aggregateType, URI eventStoreUri, String accessKey, String secretAccessKey, Class<A> aggregateClass) {
     this.aggregateType = aggregateType;
     this.eventStoreUri = eventStoreUri;
     this.accessKey = accessKey;
