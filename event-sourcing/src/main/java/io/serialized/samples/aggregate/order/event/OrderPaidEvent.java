@@ -1,5 +1,6 @@
 package io.serialized.samples.aggregate.order.event;
 
+import io.serialized.samples.aggregate.order.Amount;
 import io.serialized.samples.aggregate.order.OrderState;
 
 import java.io.Serializable;
@@ -8,12 +9,10 @@ public class OrderPaidEvent extends AbstractOrderEvent {
 
   public Data data = new Data();
 
-  OrderPaidEvent() {
-    // Needed for serialization
-  }
-
-  public OrderPaidEvent(long amount) {
-    data.amount = amount;
+  public static OrderPaidEvent orderPaid(Amount paidAmount) {
+    OrderPaidEvent event = new OrderPaidEvent();
+    event.data.amount = paidAmount.amount;
+    return event;
   }
 
   public static class Data implements Serializable {

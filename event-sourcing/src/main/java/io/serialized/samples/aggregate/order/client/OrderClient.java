@@ -4,12 +4,13 @@ import io.serialized.samples.aggregate.order.OrderState;
 import io.serialized.samples.aggregate.order.event.AbstractOrderEvent;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface OrderClient {
 
   void saveEvent(String aggregateId, Integer expectedVersion, AbstractOrderEvent event);
 
-  OrderState load(String aggregateId);
+  OrderState load(UUID aggregateId);
 
   class Aggregate {
     public String aggregateId;

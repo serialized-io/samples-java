@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
 import java.net.URI;
 import java.util.Collections;
+import java.util.UUID;
 
 import static io.serialized.samples.aggregate.order.client.OrderClient.EventBatch.newEventBatch;
 
@@ -38,9 +39,9 @@ public class DefaultOrderClient implements OrderClient {
   }
 
   @Override
-  public OrderState load(String aggregateId) {
+  public OrderState load(UUID aggregateId) {
     System.out.println("Loading aggregate with ID: " + aggregateId);
-    Invocation.Builder builder = client.target(eventStoreUri).path(aggregateType).path(aggregateId).request();
+    Invocation.Builder builder = client.target(eventStoreUri).path(aggregateType).path(aggregateId.toString()).request();
     Aggregate aggregate = addApiKeyHeaders(builder).get(Aggregate.class);
     return OrderState.loadFromEvents(aggregate.aggregateId, aggregate.aggregateVersion, aggregate.events);
   }

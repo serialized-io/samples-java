@@ -8,12 +8,10 @@ public class OrderCancelledEvent extends AbstractOrderEvent {
 
   public Data data = new Data();
 
-  OrderCancelledEvent() {
-    // Needed for serialization
-  }
-
-  public OrderCancelledEvent(String reason) {
-    data.reason = reason;
+  public static OrderCancelledEvent orderCancelled(String reason) {
+    OrderCancelledEvent event = new OrderCancelledEvent();
+    event.data.reason = reason;
+    return event;
   }
 
   public static class Data implements Serializable {

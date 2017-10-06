@@ -10,8 +10,10 @@ import io.serialized.samples.aggregate.order.event.OrderShippedEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
-import java.util.UUID;
 
+import static io.serialized.samples.aggregate.order.CustomerId.newCustomer;
+import static io.serialized.samples.aggregate.order.OrderId.newOrder;
+import static io.serialized.samples.aggregate.order.TrackingNumber.newTrackingNumber;
 import static org.apache.commons.lang.StringUtils.defaultString;
 
 public class OrderTest {
@@ -28,20 +30,20 @@ public class OrderTest {
 
     // ======================================================================================================
 
-    String orderId1 = UUID.randomUUID().toString();
+    OrderId orderId1 = newOrder();
     // Create..
     OrderState orderInitState = OrderState.builder(orderId1).build();
-    Order order = new Order(orderInitState);
+    Order order = new Order(orderInitState.orderStatus, Amount.ZERO);
     //.. and place a new order
-    OrderPlacedEvent orderPlacedEvent = order.place("someCustomerId1", 4321);
+    OrderPlacedEvent orderPlacedEvent = order.place(newCustomer(), new Amount(4321));
     System.out.println("Placing order: " + orderId1);
     orderClient.saveEvent(orderInitState.aggregateId, orderInitState.version, orderPlacedEvent);
 
     // --------------
 
     // Load..
-    OrderState orderToCancelState = orderClient.load(orderId1);
-    Order orderToCancel = new Order(orderToCancelState);
+    OrderState orderToCancelState = orderClient.load(orderId1.id);
+    Order orderToCancel = new Order(orderToCancelState.orderStatus, orderInitState.orderAmount);
     // ..and cancel order
     OrderCancelledEvent orderCancelledEvent = orderToCancel.cancel("DOA");
     System.out.println("Cancelling order: " + orderId1);
@@ -49,32 +51,32 @@ public class OrderTest {
 
     // ======================================================================================================
 
-    String orderId2 = UUID.randomUUID().toString();
+    OrderId orderId2 = OrderId.newOrder();
     // Create..
     OrderState orderInitState1 = OrderState.builder(orderId2).build();
-    Order order1 = new Order(orderInitState1);
+    Order order1 = new Order(orderInitState1.orderStatus, orderInitState.orderAmount);
     // ..and place a new order
-    OrderPlacedEvent orderPlacedEvent1 = order1.place("someCustomerId2", 1234);
+    OrderPlacedEvent orderPlacedEvent1 = order1.place(newCustomer(), new Amount(1234));
     System.out.println("Placing order: " + orderId2);
     orderClient.saveEvent(orderInitState1.aggregateId, orderInitState1.version, orderPlacedEvent1);
 
     // --------------
 
     // Load..
-    OrderState orderToPayState = orderClient.load(orderId2);
-    Order orderToPay = new Order(orderToPayState);
+    OrderState orderToPayState = orderClient.load(orderId2.id);
+    Order orderToPay = new Order(orderToPayState.orderStatus, orderToPayState.orderAmount);
     // ..and pay order
-    OrderPaidEvent orderPaidEvent = orderToPay.pay(1234);
+    OrderPaidEvent orderPaidEvent = orderToPay.pay(new Amount(1234));
     System.out.println("Paying order: " + orderId2);
     orderClient.saveEvent(orderToPayState.aggregateId, orderToPayState.version, orderPaidEvent);
 
     // --------------
 
     // Load..
-    OrderState orderToShipState = orderClient.load(orderId2);
-    Order orderToShip = new Order(orderToShipState);
+    OrderState orderToShipState = orderClient.load(orderId2.id);
+    Order orderToShip = new Order(orderToShipState.orderStatus, orderToShipState.orderAmount);
     // ..and ship order
-    OrderShippedEvent orderShippedEvent = orderToShip.ship("abc-123");
+    OrderShippedEvent orderShippedEvent = orderToShip.ship(newTrackingNumber());
     System.out.println("Shipping order: " + orderId2);
     orderClient.saveEvent(orderToShipState.aggregateId, orderToShipState.version, orderShippedEvent);
 

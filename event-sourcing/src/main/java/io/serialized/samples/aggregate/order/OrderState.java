@@ -14,14 +14,10 @@ import static org.apache.commons.lang.builder.ToStringStyle.SHORT_PREFIX_STYLE;
  */
 public class OrderState {
 
-  public enum OrderStatus {
-    NEW, PLACED, CANCELLED, PAID, SHIPPED;
-  }
-
   public final String aggregateId;
   public final Integer version;
   public final OrderStatus orderStatus;
-  public final long orderAmount;
+  public final Amount orderAmount;
   public final long paidAmount;
   public final String cancelReason;
   public final String trackingNumber;
@@ -44,8 +40,8 @@ public class OrderState {
     return builder.build();
   }
 
-  public static Builder builder(String aggregateId) {
-    return new Builder(aggregateId, 0);
+  public static Builder builder(OrderId aggregateId) {
+    return new Builder(aggregateId.id.toString(), 0);
   }
 
   public static Builder builder(String aggregateId, Integer version) {
@@ -57,7 +53,7 @@ public class OrderState {
     private final Integer version;
 
     private OrderStatus orderStatus = OrderStatus.NEW;
-    private long orderAmount;
+    private Amount orderAmount;
     private String cancelReason;
     private String trackingNumber;
     private long paidAmount;
@@ -67,24 +63,28 @@ public class OrderState {
       this.version = version;
     }
 
-    public void apply(OrderPlacedEvent event) {
+    public Builder apply(OrderPlacedEvent event) {
       this.orderStatus = OrderStatus.PLACED;
-      this.orderAmount = event.data.orderAmount;
+      this.orderAmount = new Amount(event.data.orderAmount);
+      return this;
     }
 
-    public void apply(OrderPaidEvent event) {
+    public Builder apply(OrderPaidEvent event) {
       this.orderStatus = OrderStatus.PAID;
       this.paidAmount = event.data.amount;
+      return this;
     }
 
-    public void apply(OrderCancelledEvent event) {
+    public Builder apply(OrderCancelledEvent event) {
       this.orderStatus = OrderStatus.CANCELLED;
       this.cancelReason = event.data.reason;
+      return this;
     }
 
-    public void apply(OrderShippedEvent event) {
+    public Builder apply(OrderShippedEvent event) {
       this.orderStatus = OrderStatus.SHIPPED;
       this.trackingNumber = event.data.trackingNumber;
+      return this;
     }
 
     public OrderState build() {

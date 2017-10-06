@@ -1,54 +1,48 @@
 package io.serialized.samples.aggregate.order;
 
-import io.serialized.samples.aggregate.order.OrderState.OrderStatus;
 import io.serialized.samples.aggregate.order.event.OrderCancelledEvent;
 import io.serialized.samples.aggregate.order.event.OrderPaidEvent;
 import io.serialized.samples.aggregate.order.event.OrderPlacedEvent;
 import io.serialized.samples.aggregate.order.event.OrderShippedEvent;
 
+import static io.serialized.samples.aggregate.order.event.OrderCancelledEvent.orderCancelled;
+import static io.serialized.samples.aggregate.order.event.OrderPaidEvent.orderPaid;
+import static io.serialized.samples.aggregate.order.event.OrderPlacedEvent.orderPlaced;
+import static io.serialized.samples.aggregate.order.event.OrderShippedEvent.orderShipped;
+
 public class Order {
 
-  private final OrderState state;
+  private final OrderStatus status;
+  private final Amount orderAmount;
 
-  public Order(OrderState state) {
-    this.state = state;
+  public static Order createNewOrder() {
+    return new Order(OrderStatus.NEW, Amount.ZERO);
   }
 
-  public OrderPlacedEvent place(String customerId, long orderAmount) {
-    assertNotYetPlaced();
-    return new OrderPlacedEvent(customerId, orderAmount);
+  public Order(OrderStatus status, Amount orderAmount) {
+    this.status = status;
+    this.orderAmount = orderAmount;
   }
 
-  public OrderPaidEvent pay(long amount) {
-    assertPlaced();
-    assertAcceptedAmount(amount);
-    return new OrderPaidEvent(amount);
+  public OrderPlacedEvent place(CustomerId customerId, Amount orderAmount) {
+    status.assertNotYetPlaced();
+    return orderPlaced(customerId, orderAmount);
   }
 
-  public OrderShippedEvent ship(String trackingNumber) {
-    assertPaid();
-    return new OrderShippedEvent(trackingNumber);
+  public OrderPaidEvent pay(Amount amount) {
+    status.assertPlaced();
+    Amount paidAmount = orderAmount.clear(amount);
+    return orderPaid(paidAmount);
+  }
+
+  public OrderShippedEvent ship(TrackingNumber trackingNumber) {
+    status.assertPaid();
+    return orderShipped(trackingNumber);
   }
 
   public OrderCancelledEvent cancel(String reason) {
-    assertPlaced();
-    return new OrderCancelledEvent(reason);
-  }
-
-  private void assertNotYetPlaced() {
-    if (state.orderStatus != OrderStatus.NEW) throw new IllegalStateException("Expected order to be NEW!");
-  }
-
-  private void assertPlaced() {
-    if (state.orderStatus != OrderStatus.PLACED) throw new IllegalStateException("Expected order to be PLACED!");
-  }
-
-  private void assertPaid() {
-    if (state.orderStatus != OrderStatus.PAID) throw new IllegalStateException("Expected order to be PAID!");
-  }
-
-  private void assertAcceptedAmount(long amount) {
-    if (state.orderAmount != amount) throw new IllegalArgumentException("Wrong amount!");
+    status.assertPlaced();
+    return orderCancelled(reason);
   }
 
 }
