@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import static io.serialized.samples.aggregate.order.CustomerId.newCustomer;
 import static io.serialized.samples.aggregate.order.Order.createNewOrder;
-import static io.serialized.samples.aggregate.order.OrderId.newOrder;
+import static io.serialized.samples.aggregate.order.OrderId.newOrderId;
 import static io.serialized.samples.aggregate.order.event.OrderPaidEvent.orderPaid;
 import static io.serialized.samples.aggregate.order.event.OrderPlacedEvent.orderPlaced;
 import static org.hamcrest.core.Is.is;
@@ -25,7 +25,7 @@ public class OrderTest {
   @Test
   public void pay() throws Exception {
 
-    OrderState state = OrderState.builder(newOrder())
+    OrderState state = OrderState.builder(newOrderId())
         .apply(orderPlaced(newCustomer(), new Amount(200)))
         .build();
 
@@ -37,7 +37,7 @@ public class OrderTest {
   @Test(expected = IllegalStateException.class)
   public void cannotPayNewOrder() throws Exception {
 
-    OrderState state = OrderState.builder(newOrder()).build();
+    OrderState state = OrderState.builder(newOrderId()).build();
 
     Order order = new Order(state.orderStatus, state.orderAmount);
     order.pay(new Amount(200));
@@ -46,7 +46,7 @@ public class OrderTest {
   @Test(expected = IllegalStateException.class)
   public void cannotShipUnpaidOrder() throws Exception {
 
-    OrderState state = OrderState.builder(newOrder())
+    OrderState state = OrderState.builder(newOrderId())
         .apply(orderPlaced(newCustomer(), new Amount(200)))
         .build();
 
@@ -57,7 +57,7 @@ public class OrderTest {
   @Test
   public void canShipPaidOrder() throws Exception {
 
-    OrderState state = OrderState.builder(newOrder())
+    OrderState state = OrderState.builder(newOrderId())
         .apply(orderPlaced(newCustomer(), new Amount(200)))
         .apply(orderPaid(new Amount(200)))
         .build();

@@ -21,7 +21,7 @@ public class OrderId extends ValueObject {
     }
   }
 
-  public static final OrderId newOrder() {
+  public static final OrderId newOrderId() {
     return new OrderId(UUID.randomUUID().toString());
   }
 

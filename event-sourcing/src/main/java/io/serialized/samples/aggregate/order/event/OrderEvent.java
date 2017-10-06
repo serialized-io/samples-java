@@ -41,7 +41,7 @@ public abstract class OrderEvent implements Serializable {
    *
    * @param builder Mutable state builder
    */
-  abstract public void apply(OrderState.Builder builder);
+  public abstract void apply(OrderState.Builder builder);
 
   @Override
   public boolean equals(Object o) {

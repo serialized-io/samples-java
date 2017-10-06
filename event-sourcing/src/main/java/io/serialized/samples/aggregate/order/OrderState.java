@@ -14,7 +14,7 @@ import static org.apache.commons.lang.builder.ToStringStyle.SHORT_PREFIX_STYLE;
  */
 public class OrderState {
 
-  public final String aggregateId;
+  public final String orderId;
   public final Integer version;
   public final OrderStatus orderStatus;
   public final Amount orderAmount;
@@ -23,7 +23,7 @@ public class OrderState {
   public final String trackingNumber;
 
   private OrderState(Builder builder) {
-    aggregateId = builder.aggregateId;
+    orderId = builder.orderId;
     version = builder.version;
     orderStatus = builder.orderStatus;
     orderAmount = builder.orderAmount;
@@ -49,7 +49,7 @@ public class OrderState {
   }
 
   public static class Builder {
-    private final String aggregateId;
+    private final String orderId;
     private final Integer version;
 
     private OrderStatus orderStatus = OrderStatus.NEW;
@@ -58,8 +58,8 @@ public class OrderState {
     private String trackingNumber;
     private long paidAmount;
 
-    public Builder(String aggregateId, Integer version) {
-      this.aggregateId = aggregateId;
+    public Builder(String orderId, Integer version) {
+      this.orderId = orderId;
       this.version = version;
     }
 
