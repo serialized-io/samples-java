@@ -11,7 +11,7 @@ public class Amount extends ValueObject {
   public final long amount;
 
   public Amount(long amount) {
-    checkArgument(amount > 0, "Amount cannot be negative");
+    checkArgument(amount >= 0, "Amount cannot be negative");
     this.amount = amount;
   }
 
