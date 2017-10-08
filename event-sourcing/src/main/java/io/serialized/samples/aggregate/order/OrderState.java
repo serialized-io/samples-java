@@ -33,11 +33,7 @@ public class OrderState {
   }
 
   public static OrderState loadFromEvents(String orderId, Integer version, List<OrderEvent> events) {
-    Builder builder = OrderState.builder(orderId, version);
-    for (OrderEvent event : events) {
-      event.apply(builder);
-    }
-    return builder.build();
+    return OrderState.builder(orderId, version).apply(events).build();
   }
 
   public static Builder builder(OrderId orderId) {
@@ -61,6 +57,11 @@ public class OrderState {
     public Builder(String orderId, Integer version) {
       this.orderId = orderId;
       this.version = version;
+    }
+
+    public Builder apply(List<OrderEvent> events) {
+      events.forEach(event -> event.apply(this));
+      return this;
     }
 
     public Builder apply(OrderPlacedEvent event) {
