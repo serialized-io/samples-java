@@ -31,7 +31,7 @@ public class Order {
 
   public OrderPaidEvent pay(Amount amount) {
     status.assertPlaced();
-    Amount amountLeft = orderAmount.clear(amount);
+    Amount amountLeft = orderAmount.clearAmount(amount);
     return orderPaid(this.orderAmount, amountLeft);
   }
 

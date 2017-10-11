@@ -15,7 +15,7 @@ public class Amount extends ValueObject {
     this.amount = amount;
   }
 
-  public Amount clear(Amount amount) {
+  public Amount clearAmount(Amount amount) {
     if (this.amount == amount.amount) {
       return ZERO;
     } else {
