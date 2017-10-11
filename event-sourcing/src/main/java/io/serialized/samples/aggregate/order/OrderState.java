@@ -18,7 +18,6 @@ public class OrderState {
   public final Integer version;
   public final OrderStatus orderStatus;
   public final Amount orderAmount;
-  public final long paidAmount;
   public final String cancelReason;
   public final String trackingNumber;
 
@@ -27,7 +26,6 @@ public class OrderState {
     version = builder.version;
     orderStatus = builder.orderStatus;
     orderAmount = builder.orderAmount;
-    paidAmount = builder.paidAmount;
     cancelReason = builder.cancelReason;
     trackingNumber = builder.trackingNumber;
   }
@@ -52,7 +50,6 @@ public class OrderState {
     private Amount orderAmount;
     private String cancelReason;
     private String trackingNumber;
-    private long paidAmount;
 
     public Builder(String orderId, Integer version) {
       this.orderId = orderId;
@@ -72,7 +69,7 @@ public class OrderState {
 
     public Builder apply(OrderPaidEvent event) {
       this.orderStatus = OrderStatus.PAID;
-      this.paidAmount = event.data.amount;
+      this.orderAmount = new Amount(event.data.amountLeft);
       return this;
     }
 

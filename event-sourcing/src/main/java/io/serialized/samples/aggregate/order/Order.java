@@ -31,8 +31,8 @@ public class Order {
 
   public OrderPaidEvent pay(Amount amount) {
     status.assertPlaced();
-    Amount paidAmount = orderAmount.clear(amount);
-    return orderPaid(paidAmount);
+    Amount amountLeft = orderAmount.clear(amount);
+    return orderPaid(this.orderAmount, amountLeft);
   }
 
   public OrderShippedEvent ship(TrackingNumber trackingNumber) {

@@ -18,7 +18,7 @@ public class OrderFeedEntryHandler implements FeedEntryHandler {
           break;
         }
         case "OrderPaidEvent": {
-          System.out.println(format("The order with ID [%s] was paid, amount: %s", feedEntry.aggregateId, event.data.get("amount")));
+          System.out.println(format("The order with ID [%s] was paid, amountPaid: %s, amountLeft: %s", feedEntry.aggregateId, event.data.get("amountPaid"), event.data.get("amountLeft")));
           break;
         }
         case "OrderShippedEvent": {

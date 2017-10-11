@@ -9,14 +9,16 @@ public class OrderPaidEvent extends OrderEvent {
 
   public Data data = new Data();
 
-  public static OrderPaidEvent orderPaid(Amount paidAmount) {
+  public static OrderPaidEvent orderPaid(Amount paidAmount, Amount amountLeft) {
     OrderPaidEvent event = new OrderPaidEvent();
-    event.data.amount = paidAmount.amount;
+    event.data.amountPaid = paidAmount.amount;
+    event.data.amountLeft = amountLeft.amount;
     return event;
   }
 
   public static class Data implements Serializable {
-    public long amount;
+    public long amountPaid;
+    public long amountLeft;
   }
 
   @Override

@@ -17,7 +17,7 @@ public class Amount extends ValueObject {
 
   public Amount clear(Amount amount) {
     if (this.amount == amount.amount) {
-      return this;
+      return ZERO;
     } else {
       throw new IllegalArgumentException("Wrong amount!");
     }

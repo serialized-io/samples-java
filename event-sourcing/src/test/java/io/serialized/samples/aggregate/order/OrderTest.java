@@ -31,7 +31,7 @@ public class OrderTest {
 
     Order order = new Order(state.orderStatus, state.orderAmount);
     OrderPaidEvent paidEvent = order.pay(new Amount(200));
-    assertThat(paidEvent.data.amount, is(200L));
+    assertThat(paidEvent.data.amountLeft, is(0L));
   }
 
   @Test(expected = IllegalStateException.class)
@@ -59,7 +59,7 @@ public class OrderTest {
 
     OrderState state = OrderState.builder(newOrderId())
         .apply(orderPlaced(newCustomer(), new Amount(200)))
-        .apply(orderPaid(new Amount(200)))
+        .apply(orderPaid(new Amount(200), new Amount(0)))
         .build();
 
     Order order = new Order(state.orderStatus, state.orderAmount);
