@@ -11,4 +11,5 @@ public interface EventService<E, T> {
 
   void saveEvent(String aggregateId, Integer expectedVersion, E event);
 
+  void saveEvents(String aggregateId, Integer expectedVersion, List<E> events);
 }

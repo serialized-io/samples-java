@@ -67,9 +67,13 @@ public class OrderState {
       return this;
     }
 
-    public Builder apply(OrderPaidEvent event) {
+    public Builder apply(PaymentReceivedEvent event) {
+      this.orderAmount = this.orderAmount.subtract(event.data.amountPaid);
+      return this;
+    }
+
+    public Builder apply(OrderFullyPaidEvent orderFullyPaidEvent) {
       this.orderStatus = OrderStatus.PAID;
-      this.orderAmount = new Amount(event.data.amountLeft);
       return this;
     }
 
@@ -82,6 +86,10 @@ public class OrderState {
     public Builder apply(OrderShippedEvent event) {
       this.orderStatus = OrderStatus.SHIPPED;
       this.trackingNumber = event.data.trackingNumber;
+      return this;
+    }
+
+    public Builder apply(PaymentExceededOrderAmountEvent event) {
       return this;
     }
 

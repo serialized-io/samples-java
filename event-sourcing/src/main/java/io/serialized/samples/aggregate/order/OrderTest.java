@@ -1,13 +1,14 @@
 package io.serialized.samples.aggregate.order;
 
 import io.serialized.samples.aggregate.order.event.OrderCancelledEvent;
-import io.serialized.samples.aggregate.order.event.OrderPaidEvent;
+import io.serialized.samples.aggregate.order.event.OrderEvent;
 import io.serialized.samples.aggregate.order.event.OrderPlacedEvent;
 import io.serialized.samples.aggregate.order.event.OrderShippedEvent;
 import io.serialized.samples.infrastructure.order.SerializedOrderEventService;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 import static io.serialized.samples.aggregate.order.CustomerId.newCustomer;
@@ -65,9 +66,10 @@ public class OrderTest {
     OrderState orderToPayState = orderEventStore.load(orderId2.id);
     Order orderToPay = new Order(orderToPayState.orderStatus, orderToPayState.orderAmount);
     // ..and pay order
-    OrderPaidEvent orderPaidEvent = orderToPay.pay(new Amount(1234));
+    List<OrderEvent> events = orderToPay.pay(new Amount(1234));
+
     System.out.println("Paying order: " + orderId2);
-    orderEventStore.saveEvent(orderToPayState.orderId, orderToPayState.version, orderPaidEvent);
+    orderEventStore.saveEvents(orderToPayState.orderId, orderToPayState.version, events);
 
     // --------------
 

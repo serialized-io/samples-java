@@ -15,12 +15,23 @@ public class Amount extends ValueObject {
     this.amount = amount;
   }
 
-  public Amount clearAmount(Amount amount) {
-    if (this.amount == amount.amount) {
-      return ZERO;
-    } else {
-      throw new IllegalArgumentException("Wrong amount!");
-    }
+  public Amount subtract(long amountPaid) {
+    return new Amount(this.amount - amountPaid);
   }
 
+  public Amount difference(Amount other) {
+    return new Amount(Math.abs(amount - other.amount));
+  }
+
+  public boolean isPositive() {
+    return amount > 0;
+  }
+
+  public boolean largerThan(Amount other) {
+    return amount > other.amount;
+  }
+
+  public boolean largerThanEq(Amount other) {
+    return amount >= other.amount;
+  }
 }

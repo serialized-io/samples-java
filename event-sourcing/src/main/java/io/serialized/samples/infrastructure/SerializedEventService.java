@@ -52,6 +52,11 @@ public abstract class SerializedEventService<E, T, A extends SerializedEventServ
   @Override
   public void saveEvent(String aggregateId, Integer expectedVersion, E event) {
     List<E> events = Collections.singletonList(event);
+    saveEvents(aggregateId, expectedVersion, events);
+  }
+
+  @Override
+  public void saveEvents(String aggregateId, Integer expectedVersion, List<E> events) {
     doPost(newEventBatch(aggregateId, expectedVersion, events));
   }
 

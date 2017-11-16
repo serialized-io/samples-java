@@ -1,15 +1,17 @@
 package io.serialized.samples.aggregate.order;
 
-import io.serialized.samples.aggregate.order.event.OrderPaidEvent;
-import io.serialized.samples.aggregate.order.event.OrderPlacedEvent;
-import io.serialized.samples.aggregate.order.event.OrderShippedEvent;
+import io.serialized.samples.aggregate.order.event.*;
 import org.junit.Test;
 
+import java.util.List;
+
+import static com.google.common.base.Predicates.instanceOf;
 import static io.serialized.samples.aggregate.order.CustomerId.newCustomer;
 import static io.serialized.samples.aggregate.order.Order.createNewOrder;
 import static io.serialized.samples.aggregate.order.OrderId.newOrderId;
-import static io.serialized.samples.aggregate.order.event.OrderPaidEvent.orderPaid;
+import static io.serialized.samples.aggregate.order.event.OrderFullyPaidEvent.orderFullyPaid;
 import static io.serialized.samples.aggregate.order.event.OrderPlacedEvent.orderPlaced;
+import static io.serialized.samples.aggregate.order.event.PaymentReceivedEvent.paymentReceived;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -23,15 +25,33 @@ public class OrderTest {
   }
 
   @Test
-  public void pay() throws Exception {
+  public void payCorrectAmount() throws Exception {
 
     OrderState state = OrderState.builder(newOrderId())
         .apply(orderPlaced(newCustomer(), new Amount(200)))
         .build();
 
     Order order = new Order(state.orderStatus, state.orderAmount);
-    OrderPaidEvent paidEvent = order.pay(new Amount(200));
-    assertThat(paidEvent.data.amountLeft, is(0L));
+    List<OrderEvent> events = order.pay(new Amount(200));
+
+    assertThat(events.stream().filter(instanceOf(PaymentReceivedEvent.class)::apply).count(), is(1L));
+    assertThat(events.stream().filter(instanceOf(OrderFullyPaidEvent.class)::apply).count(), is(1L));
+    assertThat(events.stream().anyMatch(instanceOf(PaymentExceededOrderAmountEvent.class)::apply), is(false));
+  }
+
+  @Test
+  public void payWithExceedingAmount() throws Exception {
+
+    OrderState state = OrderState.builder(newOrderId())
+        .apply(orderPlaced(newCustomer(), new Amount(200)))
+        .build();
+
+    Order order = new Order(state.orderStatus, state.orderAmount);
+    List<OrderEvent> events = order.pay(new Amount(500));
+
+    assertThat(events.stream().filter(instanceOf(PaymentReceivedEvent.class)::apply).count(), is(1L));
+    assertThat(events.stream().filter(instanceOf(PaymentExceededOrderAmountEvent.class)::apply).count(), is(1L));
+    assertThat(events.stream().filter(instanceOf(OrderFullyPaidEvent.class)::apply).count(), is(1L));
   }
 
   @Test(expected = IllegalStateException.class)
@@ -59,7 +79,8 @@ public class OrderTest {
 
     OrderState state = OrderState.builder(newOrderId())
         .apply(orderPlaced(newCustomer(), new Amount(200)))
-        .apply(orderPaid(new Amount(200), new Amount(0)))
+        .apply(paymentReceived(new Amount(200L)))
+        .apply(orderFullyPaid())
         .build();
 
     Order order = new Order(state.orderStatus, state.orderAmount);

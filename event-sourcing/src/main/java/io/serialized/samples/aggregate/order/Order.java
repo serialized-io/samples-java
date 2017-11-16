@@ -1,14 +1,20 @@
 package io.serialized.samples.aggregate.order;
 
 import io.serialized.samples.aggregate.order.event.OrderCancelledEvent;
-import io.serialized.samples.aggregate.order.event.OrderPaidEvent;
+import io.serialized.samples.aggregate.order.event.OrderEvent;
 import io.serialized.samples.aggregate.order.event.OrderPlacedEvent;
 import io.serialized.samples.aggregate.order.event.OrderShippedEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkArgument;
 import static io.serialized.samples.aggregate.order.event.OrderCancelledEvent.orderCancelled;
-import static io.serialized.samples.aggregate.order.event.OrderPaidEvent.orderPaid;
+import static io.serialized.samples.aggregate.order.event.OrderFullyPaidEvent.orderFullyPaid;
 import static io.serialized.samples.aggregate.order.event.OrderPlacedEvent.orderPlaced;
 import static io.serialized.samples.aggregate.order.event.OrderShippedEvent.orderShipped;
+import static io.serialized.samples.aggregate.order.event.PaymentExceededOrderAmountEvent.paymentExceededOrderAmount;
+import static io.serialized.samples.aggregate.order.event.PaymentReceivedEvent.paymentReceived;
 
 public class Order {
 
@@ -29,10 +35,22 @@ public class Order {
     return orderPlaced(customerId, orderAmount);
   }
 
-  public OrderPaidEvent pay(Amount amount) {
+  public List<OrderEvent> pay(Amount amount) {
     status.assertPlaced();
-    Amount amountLeft = orderAmount.clearAmount(amount);
-    return orderPaid(this.orderAmount, amountLeft);
+    checkArgument(amount.isPositive());
+    List<OrderEvent> events = new ArrayList<>();
+    events.add(paymentReceived(amount));
+
+    if (amount.largerThanEq(orderAmount)) {
+      events.add(orderFullyPaid());
+    }
+
+    if (amount.largerThan(orderAmount)) {
+      Amount difference = amount.difference(orderAmount);
+      events.add(paymentExceededOrderAmount(difference));
+    }
+
+    return events;
   }
 
   public OrderShippedEvent ship(TrackingNumber trackingNumber) {
