@@ -12,7 +12,7 @@ public class FeedTest {
 
   private static final URI ORDER_FEED_URI = URI.create("https://api.serialized.io/feeds/order");
 
-  public static void main(String[] args) throws InterruptedException {
+  public static void main(String[] args) {
     String accessKey = getConfig("SERIALIZED_ACCESS_KEY");
     String secretAccessKey = getConfig("SERIALIZED_SECRET_ACCESS_KEY");
 
