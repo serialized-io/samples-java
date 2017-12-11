@@ -18,14 +18,14 @@ import static org.junit.Assert.assertThat;
 public class OrderTest {
 
   @Test
-  public void placeNewOrderGeneratesEvent() throws Exception {
+  public void placeNewOrderGeneratesEvent() {
     Order order = createNewOrder();
     OrderPlacedEvent placedEvent = order.place(newCustomer(), new Amount(200));
     assertThat(placedEvent.data.orderAmount, is(200L));
   }
 
   @Test
-  public void payCorrectAmount() throws Exception {
+  public void payCorrectAmount() {
 
     OrderState state = OrderState.builder(newOrderId())
         .apply(orderPlaced(newCustomer(), new Amount(200)))
@@ -40,7 +40,7 @@ public class OrderTest {
   }
 
   @Test
-  public void payWithExceedingAmount() throws Exception {
+  public void payWithExceedingAmount() {
 
     OrderState state = OrderState.builder(newOrderId())
         .apply(orderPlaced(newCustomer(), new Amount(200)))
@@ -55,7 +55,7 @@ public class OrderTest {
   }
 
   @Test(expected = IllegalStateException.class)
-  public void cannotPayNewOrder() throws Exception {
+  public void cannotPayNewOrder() {
 
     OrderState state = OrderState.builder(newOrderId()).build();
 
@@ -64,7 +64,7 @@ public class OrderTest {
   }
 
   @Test(expected = IllegalStateException.class)
-  public void cannotShipUnpaidOrder() throws Exception {
+  public void cannotShipUnpaidOrder() {
 
     OrderState state = OrderState.builder(newOrderId())
         .apply(orderPlaced(newCustomer(), new Amount(200)))
@@ -75,7 +75,7 @@ public class OrderTest {
   }
 
   @Test
-  public void canShipPaidOrder() throws Exception {
+  public void canShipPaidOrder() {
 
     OrderState state = OrderState.builder(newOrderId())
         .apply(orderPlaced(newCustomer(), new Amount(200)))
@@ -87,10 +87,6 @@ public class OrderTest {
     TrackingNumber trackingNumber = TrackingNumber.newTrackingNumber();
     OrderShippedEvent shippedEvent = order.ship(trackingNumber);
     assertThat(shippedEvent.data.trackingNumber, is(trackingNumber.trackingNumber));
-  }
-
-  @Test
-  public void cancel() throws Exception {
   }
 
 }
