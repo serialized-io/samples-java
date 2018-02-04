@@ -7,9 +7,11 @@ public class Feed {
 
   public List<FeedEntry> entries;
   public boolean hasMore;
+  public long currentSequenceNumber;
 
   public static class FeedEntry {
     public long sequenceNumber;
+
     public String aggregateId;
     public long timestamp;
     public List<FeedEntry.Event> events;
