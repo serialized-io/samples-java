@@ -30,7 +30,7 @@ public class OrderFeedEntryHandler implements FeedEntryHandler {
           break;
         }
         default:
-          throw new RuntimeException("Don't know how to handle events of type: " + event.eventType);
+          System.out.println("Don't know how to handle events of type: " + event.eventType);
       }
     }
   }
