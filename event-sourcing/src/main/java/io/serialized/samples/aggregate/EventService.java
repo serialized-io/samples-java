@@ -7,9 +7,9 @@ public interface EventService<E, T> {
 
   T load(UUID aggregateId);
 
-  T loadFromEvents(String aggregateId, Integer aggregateVersion, List<E> events);
+  T loadFromEvents(UUID aggregateId, Integer aggregateVersion, List<E> events);
 
-  void saveEvent(String aggregateId, Integer expectedVersion, E event);
+  void saveEvent(UUID aggregateId, Integer expectedVersion, E event);
 
-  void saveEvents(String aggregateId, Integer expectedVersion, List<E> events);
+  void saveEvents(UUID aggregateId, Integer expectedVersion, List<E> events);
 }

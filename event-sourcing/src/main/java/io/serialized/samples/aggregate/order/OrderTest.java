@@ -1,19 +1,23 @@
 package io.serialized.samples.aggregate.order;
 
-import io.serialized.samples.aggregate.order.event.OrderCancelledEvent;
-import io.serialized.samples.aggregate.order.event.OrderEvent;
-import io.serialized.samples.aggregate.order.event.OrderPlacedEvent;
-import io.serialized.samples.aggregate.order.event.OrderShippedEvent;
 import io.serialized.samples.infrastructure.order.SerializedOrderEventService;
+import io.serialized.samples.order.domain.Amount;
+import io.serialized.samples.order.domain.Order;
+import io.serialized.samples.order.domain.OrderId;
+import io.serialized.samples.order.domain.OrderState;
+import io.serialized.samples.order.domain.event.OrderCancelledEvent;
+import io.serialized.samples.order.domain.event.OrderEvent;
+import io.serialized.samples.order.domain.event.OrderPlacedEvent;
+import io.serialized.samples.order.domain.event.OrderShippedEvent;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-import static io.serialized.samples.aggregate.order.CustomerId.newCustomer;
-import static io.serialized.samples.aggregate.order.OrderId.newOrderId;
-import static io.serialized.samples.aggregate.order.TrackingNumber.newTrackingNumber;
+import static io.serialized.samples.order.domain.CustomerId.newCustomer;
+import static io.serialized.samples.order.domain.OrderId.newOrderId;
+import static io.serialized.samples.order.domain.TrackingNumber.newTrackingNumber;
 import static org.apache.commons.lang.StringUtils.defaultString;
 
 public class OrderTest {
@@ -37,7 +41,7 @@ public class OrderTest {
     //.. and place a new order
     OrderPlacedEvent orderPlacedEvent = order.place(newCustomer(), new Amount(4321));
     System.out.println("Placing order: " + orderId1);
-    orderEventStore.saveEvent(orderInitState.orderId, orderInitState.version, orderPlacedEvent);
+    orderEventStore.saveEvent(orderInitState.orderId.id, orderInitState.version, orderPlacedEvent);
 
     // --------------
 
@@ -47,18 +51,18 @@ public class OrderTest {
     // ..and cancel order
     OrderCancelledEvent orderCancelledEvent = orderToCancel.cancel("DOA");
     System.out.println("Cancelling order: " + orderId1);
-    orderEventStore.saveEvent(orderToCancelState.orderId, orderToCancelState.version, orderCancelledEvent);
+    orderEventStore.saveEvent(orderToCancelState.orderId.id, orderToCancelState.version, orderCancelledEvent);
 
     // ======================================================================================================
 
-    OrderId orderId2 = OrderId.newOrderId();
+    OrderId orderId2 = newOrderId();
     // Create..
     OrderState orderInitState1 = OrderState.builder(orderId2).build();
     Order order1 = new Order(orderInitState1.orderStatus, orderInitState.orderAmount);
     // ..and place a new order
     OrderPlacedEvent orderPlacedEvent1 = order1.place(newCustomer(), new Amount(1234));
     System.out.println("Placing order: " + orderId2);
-    orderEventStore.saveEvent(orderInitState1.orderId, orderInitState1.version, orderPlacedEvent1);
+    orderEventStore.saveEvent(orderInitState1.orderId.id, orderInitState1.version, orderPlacedEvent1);
 
     // --------------
 
@@ -69,7 +73,7 @@ public class OrderTest {
     List<OrderEvent> events = orderToPay.pay(new Amount(1234));
 
     System.out.println("Paying order: " + orderId2);
-    orderEventStore.saveEvents(orderToPayState.orderId, orderToPayState.version, events);
+    orderEventStore.saveEvents(orderToPayState.orderId.id, orderToPayState.version, events);
 
     // --------------
 
@@ -79,7 +83,7 @@ public class OrderTest {
     // ..and ship order
     OrderShippedEvent orderShippedEvent = orderToShip.ship(newTrackingNumber());
     System.out.println("Shipping order: " + orderId2);
-    orderEventStore.saveEvent(orderToShipState.orderId, orderToShipState.version, orderShippedEvent);
+    orderEventStore.saveEvent(orderToShipState.orderId.id, orderToShipState.version, orderShippedEvent);
 
     // ======================================================================================================
 

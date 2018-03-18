@@ -5,10 +5,6 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import java.net.URI;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -21,7 +17,6 @@ public class EventFeedClient implements Runnable {
   private static final String SERIALIZED_SECRET_ACCESS_KEY = "Serialized-Secret-Access-Key";
 
   private final Client client = ClientBuilder.newClient().register(JacksonJsonProvider.class);
-  private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
   private final AtomicLong lastConsumedSequenceNumber = new AtomicLong();
   private final AtomicBoolean hasMore = new AtomicBoolean(false);
 
@@ -29,18 +24,12 @@ public class EventFeedClient implements Runnable {
   private final FeedEntryHandler feedEntryHandler;
   private final String accessKey;
   private final String secretAccessKey;
-  private ScheduledFuture<?> handle;
 
   public EventFeedClient(URI feedUri, FeedEntryHandler feedEntryHandler, String accessKey, String secretAccessKey) {
     this.feedUri = feedUri;
     this.feedEntryHandler = feedEntryHandler;
     this.accessKey = accessKey;
     this.secretAccessKey = secretAccessKey;
-  }
-
-  public void start() {
-    System.out.println("Waiting for events...");
-    handle = executorService.scheduleWithFixedDelay(this, 2, 2, TimeUnit.SECONDS);
   }
 
   @Override
@@ -65,11 +54,6 @@ public class EventFeedClient implements Runnable {
     } catch (Exception e) {
       System.out.println(format("Error polling feed [%s]: %s", feedUri, e.getMessage()));
     }
-  }
-
-  public void stop() {
-    handle.cancel(true);
-    executorService.shutdown();
   }
 
 }

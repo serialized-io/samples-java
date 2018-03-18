@@ -46,17 +46,17 @@ public abstract class SerializedEventService<E, T, A extends SerializedEventServ
     System.out.println("Loading aggregate with ID: " + aggregateId);
     Invocation.Builder builder = client.target(eventStoreUri).path(aggregateType).path(aggregateId.toString()).request();
     A aggregate = addApiKeyHeaders(builder).get(aggregateClass);
-    return loadFromEvents(aggregate.aggregateId, aggregate.aggregateVersion, aggregate.events);
+    return loadFromEvents(UUID.fromString(aggregate.aggregateId), aggregate.aggregateVersion, aggregate.events);
   }
 
   @Override
-  public void saveEvent(String aggregateId, Integer expectedVersion, E event) {
+  public void saveEvent(UUID aggregateId, Integer expectedVersion, E event) {
     List<E> events = Collections.singletonList(event);
     saveEvents(aggregateId, expectedVersion, events);
   }
 
   @Override
-  public void saveEvents(String aggregateId, Integer expectedVersion, List<E> events) {
+  public void saveEvents(UUID aggregateId, Integer expectedVersion, List<E> events) {
     doPost(newEventBatch(aggregateId, expectedVersion, events));
   }
 
@@ -90,9 +90,9 @@ public abstract class SerializedEventService<E, T, A extends SerializedEventServ
     public List<E> events;
   }
 
-  public EventBatch newEventBatch(String aggregateId, Integer expectedVersion, List<E> events) {
+  public EventBatch newEventBatch(UUID aggregateId, Integer expectedVersion, List<E> events) {
     EventBatch eventBatch = new EventBatch();
-    eventBatch.aggregateId = aggregateId;
+    eventBatch.aggregateId = aggregateId.toString();
     eventBatch.expectedVersion = expectedVersion;
     eventBatch.events = events;
     return eventBatch;

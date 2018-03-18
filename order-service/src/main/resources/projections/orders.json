@@ -1,0 +1,59 @@
+{
+  "projectionName": "orders",
+  "feedName": "order",
+  "aggregated": false,
+  "handlers": [
+    {
+      "eventType": "OrderPlacedEvent",
+      "functions": [
+        {
+          "function": "merge"
+        },
+        {
+          "function": "set",
+          "targetSelector": "$.projection.status",
+          "rawData": "PLACED"
+        }
+      ]
+    },
+    {
+      "eventType": "OrderCancelledEvent",
+      "functions": [
+        {
+          "function": "merge"
+        },
+        {
+          "function": "set",
+          "targetSelector": "$.projection.status",
+          "rawData": "CANCELLED"
+        }
+      ]
+    },
+    {
+      "eventType": "OrderFullyPaidEvent",
+      "functions": [
+        {
+          "function": "merge"
+        },
+        {
+          "function": "set",
+          "targetSelector": "$.projection.status",
+          "rawData": "PAID"
+        }
+      ]
+    },
+    {
+      "eventType": "OrderShippedEvent",
+      "functions": [
+        {
+          "function": "merge"
+        },
+        {
+          "function": "set",
+          "targetSelector": "$.projection.status",
+          "rawData": "SHIPPED"
+        }
+      ]
+    }
+  ]
+}

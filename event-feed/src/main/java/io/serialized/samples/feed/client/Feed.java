@@ -11,9 +11,9 @@ public class Feed {
 
   public static class FeedEntry {
     public long sequenceNumber;
-
     public String aggregateId;
     public long timestamp;
+    public String type;
     public List<FeedEntry.Event> events;
 
     public static class Event {

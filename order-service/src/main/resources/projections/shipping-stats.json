@@ -1,0 +1,21 @@
+{
+  "projectionName": "shipping-stats",
+  "feedName": "order",
+  "aggregated": true,
+  "handlers": [
+    {
+      "eventType": "OrderShippedEvent",
+      "functions": [
+        {
+          "function": "prepend",
+          "eventSelector": "$.event.trackingNumber",
+          "targetSelector": "$.projection.trackingNumbers"
+        },
+        {
+          "function": "inc",
+          "targetSelector": "$.projection.shippedOrdersCount"
+        }
+      ]
+    }
+  ]
+}

@@ -5,21 +5,27 @@ import io.serialized.samples.feed.order.OrderFeedEntryHandler;
 
 import java.net.URI;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.lang.StringUtils.defaultString;
 
 public class FeedTest {
 
-  private static final URI ORDER_FEED_URI = URI.create("https://api.serialized.io/feeds/order");
+  private static final URI ORDER_FEED_API_URI = URI.create("https://api.serialized.io/feeds/order");
 
   public static void main(String[] args) {
     String accessKey = getConfig("SERIALIZED_ACCESS_KEY");
     String secretAccessKey = getConfig("SERIALIZED_SECRET_ACCESS_KEY");
 
-    System.out.format("Connecting to [%s] using [%s]\n", ORDER_FEED_URI, accessKey);
+    System.out.format("Connecting to [%s] using [%s]\n", ORDER_FEED_API_URI, accessKey);
 
     OrderFeedEntryHandler entryHandler = new OrderFeedEntryHandler();
-    new EventFeedClient(ORDER_FEED_URI, entryHandler, accessKey, secretAccessKey).start();
+    EventFeedClient feedClient = new EventFeedClient(ORDER_FEED_API_URI, entryHandler, accessKey, secretAccessKey);
+    ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    System.out.println("Waiting for events...");
+    executor.scheduleWithFixedDelay(feedClient, 2, 2, TimeUnit.SECONDS);
   }
 
   private static String getConfig(String key) {
