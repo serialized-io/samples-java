@@ -50,7 +50,7 @@ Go back to the first terminal window and you should notice that the order events
 
 #### Start the service
 
-Open a terminal window and start the service using the following command
+Open a terminal window and start the service, on port 8080, using the following command
 
 ```
 export SERIALIZED_ACCESS_KEY=<your-access-key>
@@ -91,6 +91,12 @@ The result should be:
   "status" : "PLACED"
 }
 
+```
+
+#### List orders by status
+
+```
+curl http://localhost:8080/queries/orders?status=PLACED
 ```
 
 #### Inspect the projected cross-aggregate stats projection

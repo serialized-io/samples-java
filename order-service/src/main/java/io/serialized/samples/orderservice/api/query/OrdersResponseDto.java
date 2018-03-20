@@ -4,9 +4,8 @@ import io.serialized.samples.orderservice.api.TransportObject;
 
 import java.util.List;
 
-public class ShippingStatsDto extends TransportObject {
+public class OrdersResponseDto extends TransportObject {
 
-  public List<String> trackingNumbers;
-  public Long shippedOrdersCount;
+  public List<OrderResponseDto> orders;
 
 }

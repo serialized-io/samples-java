@@ -1,28 +1,27 @@
 package io.serialized.samples.orderservice.api.query;
 
+import com.google.common.collect.ImmutableMap;
+import io.dropwizard.jersey.params.IntParam;
 import io.serialized.samples.orderservice.integration.OrderProjection;
+import io.serialized.samples.orderservice.integration.OrderProjections;
 import io.serialized.samples.orderservice.integration.ProjectionService;
 import io.serialized.samples.orderservice.integration.ShippingStatsProjection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import retrofit2.HttpException;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 
+import static java.util.stream.Collectors.toList;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.Response.*;
 
 @Path("/queries")
 @Produces(APPLICATION_JSON)
 @Consumes(APPLICATION_JSON)
 public class OrderQueryResource {
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
   private final ProjectionService projectionService;
 
   public OrderQueryResource(ProjectionService projectionService) {
@@ -30,52 +29,70 @@ public class OrderQueryResource {
   }
 
   @GET
+  @Path("orders")
+  public void getOrders(@QueryParam("status") String status,
+                        @QueryParam("skip") @DefaultValue("0") IntParam skip,
+                        @QueryParam("limit") @DefaultValue("100") IntParam limit,
+                        @Suspended AsyncResponse asyncResponse) {
+    projectionService.findOrdersByStatus(status, skip.get(), limit.get())
+        .map(this::toDto)
+        .subscribe(
+            responseDto -> asyncResponse.resume(ok(responseDto).build()),
+            onError -> asyncResponse.resume(createErrorResponse(onError))
+        );
+  }
+
+  @GET
   @Path("orders/{orderId}")
-  public Response getOrder(@PathParam("orderId") String orderId) {
-    try {
-      OrderProjection projection = getResponseBody(projectionService.getOrder(orderId).execute());
-      return Response.ok(toDto(projection)).build();
-    } catch (IOException e) {
-      logger.warn("Error getting order projection", e);
-      return Response.serverError().build();
-    }
+  public void getOrder(@PathParam("orderId") String orderId, @Suspended AsyncResponse asyncResponse) {
+    projectionService.getOrder(orderId)
+        .map(this::toDto)
+        .subscribe(
+            responseDto -> asyncResponse.resume(ok(responseDto).build()),
+            onError -> asyncResponse.resume(createErrorResponse(onError))
+        );
   }
 
   @GET
   @Path("shipping-stats")
-  public Response getShippingStats() {
-    try {
-      ShippingStatsProjection projection = getResponseBody(projectionService.getShippingStats().execute());
-      return Response.ok(toDto(projection)).build();
-    } catch (IOException e) {
-      logger.warn("Error getting order projection", e);
-      return Response.serverError().build();
+  public void getShippingStats(@Suspended AsyncResponse asyncResponse) {
+    projectionService.getShippingStats()
+        .map(this::toDto)
+        .subscribe(
+            responseDto -> asyncResponse.resume(ok(responseDto).build()),
+            onError -> asyncResponse.resume(createErrorResponse(onError))
+        );
+  }
+
+  private ShippingStatsResponseDto toDto(ShippingStatsProjection projection) {
+    ShippingStatsResponseDto shippingStatsResponseDto = new ShippingStatsResponseDto();
+    shippingStatsResponseDto.trackingNumbers = projection.data.trackingNumbers;
+    shippingStatsResponseDto.shippedOrdersCount = projection.data.shippedOrdersCount;
+    return shippingStatsResponseDto;
+  }
+
+  private OrderResponseDto toDto(OrderProjection orderProjection) {
+    OrderResponseDto orderResponseDto = new OrderResponseDto();
+    orderResponseDto.orderId = orderProjection.projectionId;
+    orderResponseDto.customerId = orderProjection.data.customerId;
+    orderResponseDto.orderAmount = orderProjection.data.orderAmount;
+    orderResponseDto.status = orderProjection.data.status;
+    orderResponseDto.trackingNumber = orderProjection.data.trackingNumber;
+    return orderResponseDto;
+  }
+
+  private OrdersResponseDto toDto(OrderProjections orderProjections) {
+    OrdersResponseDto ordersResponseDto = new OrdersResponseDto();
+    ordersResponseDto.orders = orderProjections.projections.stream().map(this::toDto).collect(toList());
+    return ordersResponseDto;
+  }
+
+  private Response createErrorResponse(Throwable throwable) {
+    if (throwable instanceof HttpException) {
+      return status(((HttpException) throwable).code()).entity(ImmutableMap.of("error", throwable.getMessage())).build();
+    } else {
+      return serverError().build();
     }
-  }
-
-  private <T> T getResponseBody(retrofit2.Response<T> response) {
-    if (!response.isSuccessful() || response.body() == null) {
-      logger.warn("Failed to get projection - response [{}]: {}", response.code(), response.errorBody());
-      throw new WebApplicationException(Response.status(response.code()).build());
-    }
-    return response.body();
-  }
-
-  private ShippingStatsDto toDto(ShippingStatsProjection projection) {
-    ShippingStatsDto shippingStatsDto = new ShippingStatsDto();
-    shippingStatsDto.trackingNumbers = projection.data.trackingNumbers;
-    shippingStatsDto.shippedOrdersCount = projection.data.shippedOrdersCount;
-    return shippingStatsDto;
-  }
-
-  private OrderDto toDto(OrderProjection orderProjection) {
-    OrderDto orderDto = new OrderDto();
-    orderDto.orderId = orderProjection.projectionId;
-    orderDto.customerId = orderProjection.data.customerId;
-    orderDto.orderAmount = orderProjection.data.orderAmount;
-    orderDto.status = orderProjection.data.status;
-    orderDto.trackingNumber = orderProjection.data.trackingNumber;
-    return orderDto;
   }
 
 }

@@ -7,12 +7,19 @@
       "eventType": "OrderPlacedEvent",
       "functions": [
         {
+          // Project entire payload
           "function": "merge"
         },
         {
+          // Add field to projection
           "function": "set",
           "targetSelector": "$.projection.status",
           "rawData": "PLACED"
+        },
+        {
+          // Make 'status' searchable
+          "function": "setref",
+          "targetSelector": "$.projection.status"
         }
       ]
     },
@@ -20,12 +27,19 @@
       "eventType": "OrderCancelledEvent",
       "functions": [
         {
+          // Project entire payload
           "function": "merge"
         },
         {
+          // Add field to projection
           "function": "set",
           "targetSelector": "$.projection.status",
           "rawData": "CANCELLED"
+        },
+        {
+          // Make 'status' searchable
+          "function": "setref",
+          "targetSelector": "$.projection.status"
         }
       ]
     },
@@ -33,12 +47,19 @@
       "eventType": "OrderFullyPaidEvent",
       "functions": [
         {
+          // Project entire payload
           "function": "merge"
         },
         {
+          // Add field to projection
           "function": "set",
           "targetSelector": "$.projection.status",
           "rawData": "PAID"
+        },
+        {
+          // Make 'status' searchable
+          "function": "setref",
+          "targetSelector": "$.projection.status"
         }
       ]
     },
@@ -46,12 +67,19 @@
       "eventType": "OrderShippedEvent",
       "functions": [
         {
+          // Project entire payload
           "function": "merge"
         },
         {
+          // Add field to projection
           "function": "set",
           "targetSelector": "$.projection.status",
           "rawData": "SHIPPED"
+        },
+        {
+          // Make 'status' searchable
+          "function": "setref",
+          "targetSelector": "$.projection.status"
         }
       ]
     }

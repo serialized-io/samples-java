@@ -12,4 +12,5 @@ public interface EventService<E, T> {
   void saveEvent(UUID aggregateId, Integer expectedVersion, E event);
 
   void saveEvents(UUID aggregateId, Integer expectedVersion, List<E> events);
+
 }
