@@ -1,7 +1,5 @@
 package io.serialized.samples.order.domain;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 public class Amount extends ValueObject {
 
   public static final Amount ZERO = new Amount(0);
@@ -9,16 +7,20 @@ public class Amount extends ValueObject {
   public final long amount;
 
   public Amount(long amount) {
-    checkArgument(amount >= 0, "Amount cannot be negative");
     this.amount = amount;
   }
 
-  public Amount subtract(long amountPaid) {
-    return new Amount(this.amount - amountPaid);
+  public Amount subtract(Amount other) {
+    return new Amount(this.amount - other.amount);
   }
 
-  public Amount difference(Amount other) {
-    return new Amount(Math.abs(amount - other.amount));
+  public Amount pay(Amount other) {
+    Amount difference = subtract(other);
+    if (difference.isPositive()) {
+      return difference;
+    } else {
+      throw new IllegalArgumentException("Payment exceeds total amount");
+    }
   }
 
   public boolean isPositive() {

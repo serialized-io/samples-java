@@ -51,9 +51,9 @@ public class OrderCommandResource {
     OrderId orderId = new OrderId(request.orderId);
     CustomerId customerId = new CustomerId(request.customerId);
     Amount orderAmount = new Amount(request.orderAmount);
-    Order order = Order.createNewOrder();
+    Order order = Order.createNewOrder(customerId);
     logger.info("Placing order: {}", orderId);
-    OrderPlacedEvent event = order.place(customerId, orderAmount);
+    OrderPlacedEvent event = order.place(orderAmount);
     Observable<EventBatch> eventBatch = Observable.just(new EventBatch(orderId.id, ImmutableList.of(event)));
     saveEventsAndResume(eventBatch, asyncResponse, throwable -> false);
   }
@@ -65,7 +65,7 @@ public class OrderCommandResource {
     Observable<EventBatch> eventBatch = eventStoreService.loadOrder(orderId.toString())
         .map(aggregate -> loadFromEvents(orderId, aggregate.aggregateVersion, aggregate.events))
         .map(orderState -> {
-          Order order = new Order(orderState.orderStatus, orderState.orderAmount);
+          Order order = new Order(orderState.customerId, orderState.orderStatus, orderState.orderAmount);
           Amount amount = new Amount(request.amount);
           logger.info("Paying [{}] for order: {}", amount, orderId);
           List<OrderEvent> events = order.pay(amount);
@@ -81,7 +81,7 @@ public class OrderCommandResource {
     Observable<EventBatch> eventBatch = eventStoreService.loadOrder(orderId.toString())
         .map(aggregate -> loadFromEvents(orderId, aggregate.aggregateVersion, aggregate.events))
         .map(orderState -> {
-          Order order = new Order(orderState.orderStatus, orderState.orderAmount);
+          Order order = new Order(orderState.customerId, orderState.orderStatus, orderState.orderAmount);
           TrackingNumber trackingNumber = new TrackingNumber(request.trackingNumber);
           logger.info("Shipping order: {}", orderId);
           OrderShippedEvent event = order.ship(trackingNumber);
@@ -97,7 +97,7 @@ public class OrderCommandResource {
     Observable<EventBatch> eventBatch = eventStoreService.loadOrder(orderId.toString())
         .map(aggregate -> loadFromEvents(orderId, aggregate.aggregateVersion, aggregate.events))
         .map(orderState -> {
-          Order order = new Order(orderState.orderStatus, orderState.orderAmount);
+          Order order = new Order(orderState.customerId, orderState.orderStatus, orderState.orderAmount);
           logger.info("Cancelling order: {}", orderId);
           OrderCancelledEvent event = order.cancel(request.reason);
           return new EventBatch(orderId.id, orderState.version, ImmutableList.of(event));
@@ -120,6 +120,8 @@ public class OrderCommandResource {
   private Response createErrorResponse(Throwable throwable) {
     if (throwable instanceof HttpException) {
       return status(((HttpException) throwable).code()).entity(ImmutableMap.of("error", throwable.getMessage())).build();
+    } else if (throwable instanceof IllegalOrderStateException || throwable instanceof IllegalArgumentException) {
+      return status(400).entity(ImmutableMap.of("error", throwable.getMessage())).build();
     } else {
       return serverError().build();
     }

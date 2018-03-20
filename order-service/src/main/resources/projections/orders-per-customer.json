@@ -9,14 +9,13 @@
       "functions": [
         {
           "function": "push",
-          "targetSelector": "$.projection.orders",
-          "eventSelector" : "$['event.orderAmount', 'aggregateId']"
+          "targetSelector": "$.projection.orders"
         },
         {
           // Set status field on projection in list
           "function": "set",
           "targetSelector": "$.projection.orders[?].status",
-          "targetFilter": "[?(@.orderId == $.event.orderId)]",
+          "targetFilter": "[?(@.aggregateId == $.event.aggregateId)]",
           "rawData": "PLACED"
         }
       ]
@@ -28,7 +27,7 @@
           // Set status field on projection in list
           "function": "set",
           "targetSelector": "$.projection.orders[?].status",
-          "targetFilter": "[?(@.orderId == $.event.orderId)]",
+          "targetFilter": "[?(@.aggregateId == $.event.aggregateId)]",
           "rawData": "CANCELLED"
         }
       ]
@@ -40,7 +39,7 @@
           // Set status field on projection in list
           "function": "set",
           "targetSelector": "$.projection.orders[?].status",
-          "targetFilter": "[?(@.orderId == $.event.orderId)]",
+          "targetFilter": "[?(@.aggregateId == $.event.aggregateId)]",
           "rawData": "PAID"
         }
       ]
@@ -52,7 +51,7 @@
           // Set status field on projection in list
           "function": "set",
           "targetSelector": "$.projection.orders[?].status",
-          "targetFilter": "[?(@.orderId == $.event.orderId)]",
+          "targetFilter": "[?(@.aggregateId == $.event.aggregateId)]",
           "rawData": "SHIPPED"
         }
       ]

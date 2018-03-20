@@ -19,11 +19,11 @@ import static org.apache.commons.lang.builder.ToStringStyle.SHORT_PREFIX_STYLE;
  */
 @JsonTypeInfo(use = NAME, include = EXISTING_PROPERTY, property = "eventType", visible = true)
 @JsonSubTypes({
-    @JsonSubTypes.Type(OrderPlacedEvent.class),
-    @JsonSubTypes.Type(PaymentReceivedEvent.class),
     @JsonSubTypes.Type(OrderCancelledEvent.class),
+    @JsonSubTypes.Type(OrderFullyPaidEvent.class),
+    @JsonSubTypes.Type(OrderPlacedEvent.class),
     @JsonSubTypes.Type(OrderShippedEvent.class),
-    @JsonSubTypes.Type(OrderFullyPaidEvent.class)
+    @JsonSubTypes.Type(PaymentReceivedEvent.class)
 })
 public abstract class OrderEvent implements Serializable {
 

@@ -19,8 +19,8 @@ public class OrderTest {
 
   @Test
   public void placeNewOrderGeneratesEvent() {
-    Order order = createNewOrder();
-    OrderPlacedEvent placedEvent = order.place(newCustomer(), new Amount(200));
+    Order order = createNewOrder(newCustomer());
+    OrderPlacedEvent placedEvent = order.place(new Amount(200));
     assertThat(placedEvent.data.orderAmount, is(200L));
   }
 
@@ -32,12 +32,11 @@ public class OrderTest {
         .apply(orderPlaced(customerId, new Amount(200)))
         .build();
 
-    Order order = new Order(state.orderStatus, state.orderAmount);
-    List<OrderEvent> events = order.pay(customerId, new Amount(200));
+    Order order = new Order(customerId, state.orderStatus, state.orderAmount);
+    List<OrderEvent> events = order.pay(new Amount(200));
 
     assertThat(events.stream().filter(instanceOf(PaymentReceivedEvent.class)::apply).count(), is(1L));
     assertThat(events.stream().filter(instanceOf(OrderFullyPaidEvent.class)::apply).count(), is(1L));
-    assertThat(events.stream().anyMatch(instanceOf(PaymentExceededOrderAmountEvent.class)::apply), is(false));
   }
 
   @Test
@@ -48,24 +47,23 @@ public class OrderTest {
         .apply(orderPlaced(customerId, new Amount(200)))
         .build();
 
-    Order order = new Order(state.orderStatus, state.orderAmount);
-    List<OrderEvent> events = order.pay(customerId, new Amount(500));
+    Order order = new Order(customerId, state.orderStatus, state.orderAmount);
+    List<OrderEvent> events = order.pay(new Amount(500));
 
     assertThat(events.stream().filter(instanceOf(PaymentReceivedEvent.class)::apply).count(), is(1L));
-    assertThat(events.stream().filter(instanceOf(PaymentExceededOrderAmountEvent.class)::apply).count(), is(1L));
     assertThat(events.stream().filter(instanceOf(OrderFullyPaidEvent.class)::apply).count(), is(1L));
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test(expected = IllegalOrderStateException.class)
   public void cannotPayNewOrder() {
 
     OrderState state = OrderState.builder(newOrderId()).build();
 
-    Order order = new Order(state.orderStatus, state.orderAmount);
-    order.pay(newCustomer(), new Amount(200));
+    Order order = new Order(newCustomer(), state.orderStatus, state.orderAmount);
+    order.pay(new Amount(200));
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test(expected = IllegalOrderStateException.class)
   public void cannotShipUnpaidOrder() {
 
     CustomerId customerId = newCustomer();
@@ -73,18 +71,18 @@ public class OrderTest {
         .apply(orderPlaced(customerId, new Amount(200)))
         .build();
 
-    Order order = new Order(state.orderStatus, state.orderAmount);
-    order.ship(customerId, TrackingNumber.newTrackingNumber());
+    Order order = new Order(customerId, state.orderStatus, state.orderAmount);
+    order.ship(TrackingNumber.newTrackingNumber());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test(expected = IllegalOrderStateException.class)
   public void cannotCancelOrderNotPlaced() {
 
     OrderState state = OrderState.builder(newOrderId())
         .build();
 
-    Order order = new Order(state.orderStatus, state.orderAmount);
-    order.cancel(newCustomer(), "DOA");
+    Order order = new Order(newCustomer(), state.orderStatus, state.orderAmount);
+    order.cancel("DOA");
   }
 
   @Test
@@ -95,9 +93,9 @@ public class OrderTest {
         .apply(orderPlaced(customerId, new Amount(200)))
         .build();
 
-    Order order = new Order(state.orderStatus, state.orderAmount);
+    Order order = new Order(customerId, state.orderStatus, state.orderAmount);
     String reason = "DOA";
-    OrderCancelledEvent cancelledEvent = order.cancel(customerId, reason);
+    OrderCancelledEvent cancelledEvent = order.cancel(reason);
     assertThat(cancelledEvent.data.reason, is(reason));
   }
 
@@ -111,9 +109,9 @@ public class OrderTest {
         .apply(orderFullyPaid(customerId))
         .build();
 
-    Order order = new Order(state.orderStatus, state.orderAmount);
+    Order order = new Order(customerId, state.orderStatus, state.orderAmount);
     TrackingNumber trackingNumber = TrackingNumber.newTrackingNumber();
-    OrderShippedEvent shippedEvent = order.ship(customerId, trackingNumber);
+    OrderShippedEvent shippedEvent = order.ship(trackingNumber);
     assertThat(shippedEvent.data.trackingNumber, is(trackingNumber.trackingNumber));
   }
 

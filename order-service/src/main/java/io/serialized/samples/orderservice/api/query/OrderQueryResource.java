@@ -2,10 +2,7 @@ package io.serialized.samples.orderservice.api.query;
 
 import com.google.common.collect.ImmutableMap;
 import io.dropwizard.jersey.params.IntParam;
-import io.serialized.samples.orderservice.integration.OrderProjection;
-import io.serialized.samples.orderservice.integration.OrderProjections;
-import io.serialized.samples.orderservice.integration.ProjectionService;
-import io.serialized.samples.orderservice.integration.ShippingStatsProjection;
+import io.serialized.samples.orderservice.integration.*;
 import retrofit2.HttpException;
 
 import javax.ws.rs.*;
@@ -43,9 +40,31 @@ public class OrderQueryResource {
   }
 
   @GET
+  @Path("customers/{customerId}/orders")
+  public void getOrdersPerCustomer(@PathParam("customerId") String customerId, @Suspended AsyncResponse asyncResponse) {
+    projectionService.findOrdersByCustomer(customerId)
+        .map(this::toDto)
+        .subscribe(
+            responseDto -> asyncResponse.resume(ok(responseDto).build()),
+            onError -> asyncResponse.resume(createErrorResponse(onError))
+        );
+  }
+
+  @GET
   @Path("orders/{orderId}")
   public void getOrder(@PathParam("orderId") String orderId, @Suspended AsyncResponse asyncResponse) {
     projectionService.getOrder(orderId)
+        .map(this::toDto)
+        .subscribe(
+            responseDto -> asyncResponse.resume(ok(responseDto).build()),
+            onError -> asyncResponse.resume(createErrorResponse(onError))
+        );
+  }
+
+  @GET
+  @Path("total-customer-debt")
+  public void getCustomerDebt(@Suspended AsyncResponse asyncResponse) {
+    projectionService.getCustomerDebt()
         .map(this::toDto)
         .subscribe(
             responseDto -> asyncResponse.resume(ok(responseDto).build()),
@@ -69,6 +88,25 @@ public class OrderQueryResource {
     shippingStatsResponseDto.trackingNumbers = projection.data.trackingNumbers;
     shippingStatsResponseDto.shippedOrdersCount = projection.data.shippedOrdersCount;
     return shippingStatsResponseDto;
+  }
+
+  private CustomerDebtsResponseDto toDto(CustomerDebtProjection projection) {
+    CustomerDebtsResponseDto responseDto = new CustomerDebtsResponseDto();
+    responseDto.totalCustomerDebt = projection.data.totalCustomerDebt;
+    return responseDto;
+  }
+
+  private OrdersResponseDto toDto(CustomerOrdersProjection customerOrdersProjection) {
+    OrdersResponseDto orderResponseDto = new OrdersResponseDto();
+    orderResponseDto.orders = customerOrdersProjection.data.orders.stream().map(orderData -> {
+      OrderResponseDto orderResponse = new OrderResponseDto();
+      orderResponse.orderId = orderData.aggregateId;
+      orderResponse.orderAmount = orderData.orderAmount;
+      orderResponse.status = orderData.status;
+      orderResponse.trackingNumber = orderData.trackingNumber;
+      return orderResponse;
+    }).collect(toList());
+    return orderResponseDto;
   }
 
   private OrderResponseDto toDto(OrderProjection orderProjection) {

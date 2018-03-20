@@ -33,10 +33,10 @@ public class OrderTest {
     OrderId orderId1 = newOrderId();
     // Create..
     OrderState orderInitState = OrderState.builder(orderId1).build();
-    Order order = new Order(orderInitState.orderStatus, Amount.ZERO);
-    //.. and place a new order
     CustomerId customer = newCustomer();
-    OrderPlacedEvent orderPlacedEvent = order.place(customer, new Amount(4321));
+    Order order = new Order(customer, orderInitState.orderStatus, Amount.ZERO);
+    //.. and place a new order
+    OrderPlacedEvent orderPlacedEvent = order.place(new Amount(4321));
     System.out.println("Placing order: " + orderId1);
     orderEventStore.saveEvent(orderInitState.orderId.id, orderInitState.version, orderPlacedEvent);
 
@@ -44,9 +44,9 @@ public class OrderTest {
 
     // Load..
     OrderState orderToCancelState = orderEventStore.load(orderId1.id);
-    Order orderToCancel = new Order(orderToCancelState.orderStatus, orderInitState.orderAmount);
+    Order orderToCancel = new Order(customer, orderToCancelState.orderStatus, orderInitState.orderAmount);
     // ..and cancel order
-    OrderCancelledEvent orderCancelledEvent = orderToCancel.cancel(customer, "DOA");
+    OrderCancelledEvent orderCancelledEvent = orderToCancel.cancel("DOA");
     System.out.println("Cancelling order: " + orderId1);
     orderEventStore.saveEvent(orderToCancelState.orderId.id, orderToCancelState.version, orderCancelledEvent);
 
@@ -55,9 +55,9 @@ public class OrderTest {
     OrderId orderId2 = newOrderId();
     // Create..
     OrderState orderInitState1 = OrderState.builder(orderId2).build();
-    Order order1 = new Order(orderInitState1.orderStatus, orderInitState.orderAmount);
+    Order order1 = new Order(newCustomer(), orderInitState1.orderStatus, orderInitState.orderAmount);
     // ..and place a new order
-    OrderPlacedEvent orderPlacedEvent1 = order1.place(newCustomer(), new Amount(1234));
+    OrderPlacedEvent orderPlacedEvent1 = order1.place(new Amount(1234));
     System.out.println("Placing order: " + orderId2);
     orderEventStore.saveEvent(orderInitState1.orderId.id, orderInitState1.version, orderPlacedEvent1);
 
@@ -65,9 +65,9 @@ public class OrderTest {
 
     // Load..
     OrderState orderToPayState = orderEventStore.load(orderId2.id);
-    Order orderToPay = new Order(orderToPayState.orderStatus, orderToPayState.orderAmount);
+    Order orderToPay = new Order(customer, orderToPayState.orderStatus, orderToPayState.orderAmount);
     // ..and pay order
-    List<OrderEvent> events = orderToPay.pay(customer, new Amount(1234));
+    List<OrderEvent> events = orderToPay.pay(new Amount(1234));
 
     System.out.println("Paying order: " + orderId2);
     orderEventStore.saveEvents(orderToPayState.orderId.id, orderToPayState.version, events);
@@ -76,9 +76,9 @@ public class OrderTest {
 
     // Load..
     OrderState orderToShipState = orderEventStore.load(orderId2.id);
-    Order orderToShip = new Order(orderToShipState.orderStatus, orderToShipState.orderAmount);
+    Order orderToShip = new Order(customer, orderToShipState.orderStatus, orderToShipState.orderAmount);
     // ..and ship order
-    OrderShippedEvent orderShippedEvent = orderToShip.ship(customer, newTrackingNumber());
+    OrderShippedEvent orderShippedEvent = orderToShip.ship(newTrackingNumber());
     System.out.println("Shipping order: " + orderId2);
     orderEventStore.saveEvent(orderToShipState.orderId.id, orderToShipState.version, orderShippedEvent);
 

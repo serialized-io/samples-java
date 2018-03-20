@@ -78,9 +78,11 @@ public class OrderApplication extends Application<OrderApplicationConfig> {
     try {
       ObjectMapper objectMapper = new ObjectMapper().configure(ALLOW_COMMENTS, true);
       createOrUpdateDefinition("orders", projectionService, readDefinitionData(objectMapper, "projections/orders.json"));
+      createOrUpdateDefinition("orders-per-customer", projectionService, readDefinitionData(objectMapper, "projections/orders-per-customer.json"));
+      createOrUpdateDefinition("total-customer-debt", projectionService, readDefinitionData(objectMapper, "projections/total-customer-debt.json"));
       createOrUpdateDefinition("shipping-stats", projectionService, readDefinitionData(objectMapper, "projections/shipping-stats.json"));
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.warn("Failed to update projections", e);
     }
   }
 

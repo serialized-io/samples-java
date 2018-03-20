@@ -17,7 +17,12 @@ public interface ProjectionService {
   @GET("projections/single/orders")
   Observable<OrderProjections> findOrdersByStatus(@Query("reference") String status, @Query("skip") int skip, @Query("limit") int limit);
 
+  @GET("projections/single/orders-per-customer/{customerId}")
+  Observable<CustomerOrdersProjection> findOrdersByCustomer(@Path("customerId") String customerId);
+
   @GET("projections/aggregated/shipping-stats")
   Observable<ShippingStatsProjection> getShippingStats();
 
+  @GET("projections/aggregated/total-customer-debt")
+  Observable<CustomerDebtProjection> getCustomerDebt();
 }

@@ -13,29 +13,30 @@ import static io.serialized.samples.order.domain.event.OrderCancelledEvent.order
 import static io.serialized.samples.order.domain.event.OrderFullyPaidEvent.orderFullyPaid;
 import static io.serialized.samples.order.domain.event.OrderPlacedEvent.orderPlaced;
 import static io.serialized.samples.order.domain.event.OrderShippedEvent.orderShipped;
-import static io.serialized.samples.order.domain.event.PaymentExceededOrderAmountEvent.paymentExceededOrderAmount;
 import static io.serialized.samples.order.domain.event.PaymentReceivedEvent.paymentReceived;
 
 public class Order {
 
+  private final CustomerId customerId;
   private final OrderStatus status;
   private final Amount orderAmount;
 
-  public static Order createNewOrder() {
-    return new Order(OrderStatus.NEW, Amount.ZERO);
+  public static Order createNewOrder(CustomerId customerId) {
+    return new Order(customerId, OrderStatus.NEW, Amount.ZERO);
   }
 
-  public Order(OrderStatus status, Amount orderAmount) {
+  public Order(CustomerId customerId, OrderStatus status, Amount orderAmount) {
+    this.customerId = customerId;
     this.status = status;
     this.orderAmount = orderAmount;
   }
 
-  public OrderPlacedEvent place(CustomerId customerId, Amount orderAmount) {
+  public OrderPlacedEvent place(Amount orderAmount) {
     status.assertNotYetPlaced();
     return orderPlaced(customerId, orderAmount);
   }
 
-  public List<OrderEvent> pay(CustomerId customerId, Amount amount) {
+  public List<OrderEvent> pay(Amount amount) {
     status.assertPlaced();
     checkArgument(amount.isPositive());
     List<OrderEvent> events = new ArrayList<>();
@@ -45,22 +46,17 @@ public class Order {
       events.add(orderFullyPaid(customerId));
     }
 
-    if (amount.largerThan(orderAmount)) {
-      Amount difference = amount.difference(orderAmount);
-      events.add(paymentExceededOrderAmount(customerId, difference));
-    }
-
     return events;
   }
 
-  public OrderShippedEvent ship(CustomerId customerId, TrackingNumber trackingNumber) {
+  public OrderShippedEvent ship(TrackingNumber trackingNumber) {
     status.assertPaid();
     return orderShipped(customerId, trackingNumber);
   }
 
-  public OrderCancelledEvent cancel(CustomerId customerId, String reason) {
+  public OrderCancelledEvent cancel(String reason) {
     status.assertPlaced();
-    return orderCancelled(customerId, reason);
+    return orderCancelled(customerId, orderAmount, reason);
   }
 
 }
