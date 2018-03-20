@@ -1,12 +1,6 @@
 package io.serialized.samples.order.domain;
 
-import io.serialized.samples.order.domain.event.OrderCancelledEvent;
-import io.serialized.samples.order.domain.event.OrderEvent;
-import io.serialized.samples.order.domain.event.OrderFullyPaidEvent;
-import io.serialized.samples.order.domain.event.OrderPlacedEvent;
-import io.serialized.samples.order.domain.event.OrderShippedEvent;
-import io.serialized.samples.order.domain.event.PaymentExceededOrderAmountEvent;
-import io.serialized.samples.order.domain.event.PaymentReceivedEvent;
+import io.serialized.samples.order.domain.event.*;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -22,6 +16,7 @@ public class OrderState {
 
   public final OrderId orderId;
   public final Integer version;
+  public final CustomerId customerId;
   public final OrderStatus orderStatus;
   public final Amount orderAmount;
   public final String cancelReason;
@@ -30,6 +25,7 @@ public class OrderState {
   private OrderState(Builder builder) {
     orderId = builder.orderId;
     version = builder.version;
+    customerId = builder.customerId;
     orderStatus = builder.orderStatus;
     orderAmount = builder.orderAmount;
     cancelReason = builder.cancelReason;
@@ -52,6 +48,7 @@ public class OrderState {
     private final OrderId orderId;
     private final Integer version;
 
+    private CustomerId customerId;
     private OrderStatus orderStatus = OrderStatus.NEW;
     private Amount orderAmount;
     private String cancelReason;
@@ -68,6 +65,7 @@ public class OrderState {
     }
 
     public Builder apply(OrderPlacedEvent event) {
+      this.customerId = new CustomerId(event.data.customerId);
       this.orderStatus = OrderStatus.PLACED;
       this.orderAmount = new Amount(event.data.orderAmount);
       return this;

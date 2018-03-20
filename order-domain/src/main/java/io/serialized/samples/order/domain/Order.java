@@ -35,32 +35,32 @@ public class Order {
     return orderPlaced(customerId, orderAmount);
   }
 
-  public List<OrderEvent> pay(Amount amount) {
+  public List<OrderEvent> pay(CustomerId customerId, Amount amount) {
     status.assertPlaced();
     checkArgument(amount.isPositive());
     List<OrderEvent> events = new ArrayList<>();
-    events.add(paymentReceived(amount));
+    events.add(paymentReceived(customerId, amount));
 
     if (amount.largerThanEq(orderAmount)) {
-      events.add(orderFullyPaid());
+      events.add(orderFullyPaid(customerId));
     }
 
     if (amount.largerThan(orderAmount)) {
       Amount difference = amount.difference(orderAmount);
-      events.add(paymentExceededOrderAmount(difference));
+      events.add(paymentExceededOrderAmount(customerId, difference));
     }
 
     return events;
   }
 
-  public OrderShippedEvent ship(TrackingNumber trackingNumber) {
+  public OrderShippedEvent ship(CustomerId customerId, TrackingNumber trackingNumber) {
     status.assertPaid();
-    return orderShipped(trackingNumber);
+    return orderShipped(customerId, trackingNumber);
   }
 
-  public OrderCancelledEvent cancel(String reason) {
+  public OrderCancelledEvent cancel(CustomerId customerId, String reason) {
     status.assertPlaced();
-    return orderCancelled(reason);
+    return orderCancelled(customerId, reason);
   }
 
 }

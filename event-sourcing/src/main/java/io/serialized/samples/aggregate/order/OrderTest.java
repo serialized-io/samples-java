@@ -1,16 +1,12 @@
 package io.serialized.samples.aggregate.order;
 
 import io.serialized.samples.infrastructure.order.SerializedOrderEventService;
-import io.serialized.samples.order.domain.Amount;
-import io.serialized.samples.order.domain.Order;
-import io.serialized.samples.order.domain.OrderId;
-import io.serialized.samples.order.domain.OrderState;
+import io.serialized.samples.order.domain.*;
 import io.serialized.samples.order.domain.event.OrderCancelledEvent;
 import io.serialized.samples.order.domain.event.OrderEvent;
 import io.serialized.samples.order.domain.event.OrderPlacedEvent;
 import io.serialized.samples.order.domain.event.OrderShippedEvent;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +20,7 @@ public class OrderTest {
 
   private static final URI EVENT_API_URI = URI.create("https://api.serialized.io/aggregates");
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) {
     String accessKey = getConfig("SERIALIZED_ACCESS_KEY");
     String secretAccessKey = getConfig("SERIALIZED_SECRET_ACCESS_KEY");
 
@@ -39,7 +35,8 @@ public class OrderTest {
     OrderState orderInitState = OrderState.builder(orderId1).build();
     Order order = new Order(orderInitState.orderStatus, Amount.ZERO);
     //.. and place a new order
-    OrderPlacedEvent orderPlacedEvent = order.place(newCustomer(), new Amount(4321));
+    CustomerId customer = newCustomer();
+    OrderPlacedEvent orderPlacedEvent = order.place(customer, new Amount(4321));
     System.out.println("Placing order: " + orderId1);
     orderEventStore.saveEvent(orderInitState.orderId.id, orderInitState.version, orderPlacedEvent);
 
@@ -49,7 +46,7 @@ public class OrderTest {
     OrderState orderToCancelState = orderEventStore.load(orderId1.id);
     Order orderToCancel = new Order(orderToCancelState.orderStatus, orderInitState.orderAmount);
     // ..and cancel order
-    OrderCancelledEvent orderCancelledEvent = orderToCancel.cancel("DOA");
+    OrderCancelledEvent orderCancelledEvent = orderToCancel.cancel(customer, "DOA");
     System.out.println("Cancelling order: " + orderId1);
     orderEventStore.saveEvent(orderToCancelState.orderId.id, orderToCancelState.version, orderCancelledEvent);
 
@@ -70,7 +67,7 @@ public class OrderTest {
     OrderState orderToPayState = orderEventStore.load(orderId2.id);
     Order orderToPay = new Order(orderToPayState.orderStatus, orderToPayState.orderAmount);
     // ..and pay order
-    List<OrderEvent> events = orderToPay.pay(new Amount(1234));
+    List<OrderEvent> events = orderToPay.pay(customer, new Amount(1234));
 
     System.out.println("Paying order: " + orderId2);
     orderEventStore.saveEvents(orderToPayState.orderId.id, orderToPayState.version, events);
@@ -81,7 +78,7 @@ public class OrderTest {
     OrderState orderToShipState = orderEventStore.load(orderId2.id);
     Order orderToShip = new Order(orderToShipState.orderStatus, orderToShipState.orderAmount);
     // ..and ship order
-    OrderShippedEvent orderShippedEvent = orderToShip.ship(newTrackingNumber());
+    OrderShippedEvent orderShippedEvent = orderToShip.ship(customer, newTrackingNumber());
     System.out.println("Shipping order: " + orderId2);
     orderEventStore.saveEvent(orderToShipState.orderId.id, orderToShipState.version, orderShippedEvent);
 
