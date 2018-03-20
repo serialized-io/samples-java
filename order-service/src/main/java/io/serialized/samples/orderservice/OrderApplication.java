@@ -31,6 +31,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class OrderApplication extends Application<OrderApplicationConfig> {
 
+  private static final int SERIALIZD_TIMEOUT_SECONDS = 30;
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
@@ -59,9 +60,9 @@ public class OrderApplication extends Application<OrderApplicationConfig> {
     return new Retrofit.Builder()
         .addConverterFactory(JacksonConverterFactory.create(objectMapper))
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-        .baseUrl(HttpUrl.parse(baseUrl.toString()))
+        .baseUrl(HttpUrl.get(baseUrl))
         .client(new OkHttpClient.Builder()
-            .readTimeout(30, SECONDS)
+            .readTimeout(SERIALIZD_TIMEOUT_SECONDS, SECONDS)
             .addInterceptor(chain -> chain.proceed(chain.request().newBuilder().headers(headers).build()))
             .addInterceptor(chain -> {
               okhttp3.Response response = chain.proceed(chain.request());

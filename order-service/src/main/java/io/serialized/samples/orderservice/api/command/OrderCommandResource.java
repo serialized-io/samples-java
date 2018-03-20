@@ -4,11 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.reactivex.Observable;
 import io.reactivex.functions.Predicate;
-import io.serialized.samples.order.domain.Amount;
-import io.serialized.samples.order.domain.CustomerId;
-import io.serialized.samples.order.domain.Order;
-import io.serialized.samples.order.domain.OrderId;
-import io.serialized.samples.order.domain.TrackingNumber;
+import io.serialized.samples.order.domain.*;
 import io.serialized.samples.order.domain.event.OrderCancelledEvent;
 import io.serialized.samples.order.domain.event.OrderEvent;
 import io.serialized.samples.order.domain.event.OrderPlacedEvent;
@@ -111,7 +107,7 @@ public class OrderCommandResource {
 
   private void saveEventsAndResume(Observable<EventBatch> observable, AsyncResponse asyncResponse, Predicate<Throwable> retry) {
     observable
-        .filter(eventBatch -> !eventBatch.events.isEmpty())
+        .filter(eventBatch -> !eventBatch.events.isEmpty()) // No-ops are represented by empty event batch
         .flatMap(eventStoreService::saveOrderEvents)
         .retry(RETRY_TIMES, retry)
         .subscribe(
