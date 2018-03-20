@@ -99,10 +99,18 @@ The result should be:
 curl http://localhost:8080/queries/orders?status=PLACED
 ```
 
-#### Inspect the projected cross-aggregate stats projection
+#### Inspect the projected stats
 
 ```
 curl http://localhost:8080/queries/shipping-stats/
+```
+
+#### Inspect the projected total customer debt
+
+See the total order amount for all orders placed but not yet paid.
+
+```
+curl http://localhost:8080/queries/total-customer-debt/
 ```
 
 #### Executing more commands

@@ -25,4 +25,5 @@ public interface ProjectionService {
 
   @GET("projections/aggregated/total-customer-debt")
   Observable<CustomerDebtProjection> getCustomerDebt();
+
 }

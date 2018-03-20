@@ -8,5 +8,4 @@ public class CustomerDebtProjection extends Projection {
     public Long totalCustomerDebt;
   }
 
-
 }
