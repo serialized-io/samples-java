@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.Map;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_COMMENTS;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
 import static com.google.common.base.Preconditions.checkState;
@@ -50,7 +51,7 @@ public class OrderApplication extends Application<OrderApplicationConfig> {
     EventStoreService eventStoreService = newRetrofitClient(apiUrl, objectMapper, headers).create(EventStoreService.class);
     ProjectionService projectionService = newRetrofitClient(apiUrl, objectMapper, headers).create(ProjectionService.class);
 
-    createOrUpdateProjections(objectMapper, projectionService);
+    createOrUpdateProjections(projectionService);
 
     environment.jersey().register(new OrderCommandResource(eventStoreService));
     environment.jersey().register(new OrderQueryResource(projectionService));
@@ -73,8 +74,9 @@ public class OrderApplication extends Application<OrderApplicationConfig> {
         .build();
   }
 
-  private void createOrUpdateProjections(ObjectMapper objectMapper, ProjectionService projectionService) {
+  private void createOrUpdateProjections(ProjectionService projectionService) {
     try {
+      ObjectMapper objectMapper = new ObjectMapper().configure(ALLOW_COMMENTS, true);
       createOrUpdateDefinition("orders", projectionService, readDefinitionData(objectMapper, "projections/orders.json"));
       createOrUpdateDefinition("shipping-stats", projectionService, readDefinitionData(objectMapper, "projections/shipping-stats.json"));
     } catch (IOException e) {
