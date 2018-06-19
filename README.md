@@ -46,7 +46,7 @@ mvn -pl event-sourcing exec:java -Dexec.mainClass="io.serialized.samples.aggrega
 You should se some output indicating the events were successfully stored in your cloud space at Serialized.io.
 Go back to the first terminal window and you should notice that the order events were successfully processed!
 
-## CQRS/ES sample application using Dropizard and rxjava to access Serialized IO
+## CQRS/ES sample application using Dropwizard and rxjava to access Serialized IO
 
 #### Start the service
 
