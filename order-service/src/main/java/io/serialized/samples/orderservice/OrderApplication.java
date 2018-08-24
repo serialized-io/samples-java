@@ -32,7 +32,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class OrderApplication extends Application<OrderApplicationConfig> {
 
-  private static final int SERIALIZD_TIMEOUT_SECONDS = 30;
+  private static final int SERIALIZED_TIMEOUT_SECONDS = 30;
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
@@ -63,7 +63,7 @@ public class OrderApplication extends Application<OrderApplicationConfig> {
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .baseUrl(HttpUrl.get(baseUrl))
         .client(new OkHttpClient.Builder()
-            .readTimeout(SERIALIZD_TIMEOUT_SECONDS, SECONDS)
+            .readTimeout(SERIALIZED_TIMEOUT_SECONDS, SECONDS)
             .addInterceptor(chain -> chain.proceed(chain.request().newBuilder().headers(headers).build()))
             .addInterceptor(chain -> {
               okhttp3.Response response = chain.proceed(chain.request());
