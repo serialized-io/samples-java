@@ -44,7 +44,7 @@ public class OrderTest {
 
     // Load..
     OrderState orderToCancelState = orderEventStore.load(orderId1.id);
-    Order orderToCancel = new Order(customer, orderToCancelState.orderStatus, orderInitState.orderAmount);
+    Order orderToCancel = new Order(customer, orderToCancelState.orderStatus, orderToCancelState.orderAmount);
     // ..and cancel order
     OrderCancelledEvent orderCancelledEvent = orderToCancel.cancel("DOA");
     System.out.println("Cancelling order: " + orderId1);
@@ -55,7 +55,7 @@ public class OrderTest {
     OrderId orderId2 = newOrderId();
     // Create..
     OrderState orderInitState1 = OrderState.builder(orderId2).build();
-    Order order1 = new Order(newCustomer(), orderInitState1.orderStatus, orderInitState.orderAmount);
+    Order order1 = new Order(newCustomer(), orderInitState1.orderStatus, orderInitState1.orderAmount);
     // ..and place a new order
     OrderPlacedEvent orderPlacedEvent1 = order1.place(new Amount(1234));
     System.out.println("Placing order: " + orderId2);
