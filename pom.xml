@@ -12,6 +12,7 @@
   <modules>
     <module>event-feed</module>
     <module>event-feed-rx</module>
+    <module>event-projector-lambda</module>
     <module>event-sourcing</module>
     <module>order-domain</module>
     <module>order-service</module>
