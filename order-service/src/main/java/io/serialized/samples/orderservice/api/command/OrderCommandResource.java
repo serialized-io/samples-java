@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.reactivex.Observable;
 import io.reactivex.functions.Predicate;
+import io.reactivex.schedulers.Schedulers;
 import io.serialized.samples.order.domain.*;
 import io.serialized.samples.order.domain.event.OrderCancelledEvent;
 import io.serialized.samples.order.domain.event.OrderEvent;
@@ -27,8 +28,10 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 import static io.serialized.samples.order.domain.OrderState.loadFromEvents;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.CONFLICT;
+import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 import static javax.ws.rs.core.Response.*;
 
 @Path("/commands")
@@ -37,6 +40,7 @@ import static javax.ws.rs.core.Response.*;
 public class OrderCommandResource {
 
   private static final int RETRY_TIMES = 3;
+  private static final long REQUEST_TIMEOUT_SECONDS = 10;
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private final EventStoreService eventStoreService;
@@ -49,12 +53,14 @@ public class OrderCommandResource {
   @Path("place-order")
   public void placeOrder(@Valid @NotNull PlaceOrderRequest request, @Suspended AsyncResponse asyncResponse) {
     OrderId orderId = new OrderId(request.orderId);
-    CustomerId customerId = new CustomerId(request.customerId);
-    Amount orderAmount = new Amount(request.orderAmount);
-    Order order = Order.createNewOrder(customerId);
-    logger.info("Placing order: {}", orderId);
-    OrderPlacedEvent event = order.place(orderAmount);
-    Observable<EventBatch> eventBatch = Observable.just(new EventBatch(orderId.id, ImmutableList.of(event)));
+    Observable<EventBatch> eventBatch = Observable.fromCallable(() -> {
+      CustomerId customerId = new CustomerId(request.customerId);
+      Amount orderAmount = new Amount(request.orderAmount);
+      Order order = Order.createNewOrder(customerId);
+      logger.info("Placing order: {}", orderId);
+      OrderPlacedEvent event = order.place(orderAmount);
+      return new EventBatch(orderId.id, ImmutableList.of(event));
+    });
     saveEventsAndResume(eventBatch, asyncResponse, throwable -> false);
   }
 
@@ -87,6 +93,7 @@ public class OrderCommandResource {
           OrderShippedEvent event = order.ship(trackingNumber);
           return new EventBatch(orderId.id, orderState.version, ImmutableList.of(event));
         });
+
     saveEventsAndResume(eventBatch, asyncResponse, this::isHttpConflict);
   }
 
@@ -106,10 +113,12 @@ public class OrderCommandResource {
   }
 
   private void saveEventsAndResume(Observable<EventBatch> observable, AsyncResponse asyncResponse, Predicate<Throwable> retry) {
+    configureTimeoutHandling(asyncResponse);
     observable
         .filter(eventBatch -> !eventBatch.events.isEmpty()) // No-ops are represented by empty event batch
         .flatMap(eventStoreService::saveOrderEvents)
         .retry(RETRY_TIMES, retry)
+        .subscribeOn(Schedulers.io())
         .subscribe(
             onNext -> asyncResponse.resume(ok().build()),
             onError -> asyncResponse.resume(createErrorResponse(onError)),
@@ -119,16 +128,25 @@ public class OrderCommandResource {
 
   private Response createErrorResponse(Throwable throwable) {
     if (throwable instanceof HttpException) {
+      logger.warn("Error: " + throwable.getMessage());
       return status(((HttpException) throwable).code()).entity(ImmutableMap.of("error", throwable.getMessage())).build();
     } else if (throwable instanceof IllegalOrderStateException || throwable instanceof IllegalArgumentException) {
+      logger.warn("Client Error: " + throwable.getMessage());
       return status(400).entity(ImmutableMap.of("error", throwable.getMessage())).build();
     } else {
+      logger.error("Server Error: " + throwable.getMessage(), throwable);
       return serverError().build();
     }
   }
 
   private boolean isHttpConflict(Throwable throwable) {
     return throwable instanceof HttpException && ((HttpException) throwable).code() == CONFLICT.getStatusCode();
+  }
+
+  private void configureTimeoutHandling(AsyncResponse response) {
+    ImmutableMap errorResponse = ImmutableMap.of("message", "Operation timed out");
+    response.setTimeout(REQUEST_TIMEOUT_SECONDS, SECONDS);
+    response.setTimeoutHandler(ar -> ar.resume(status(SERVICE_UNAVAILABLE).entity(errorResponse).build()));
   }
 
 }
