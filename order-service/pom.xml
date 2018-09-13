@@ -30,7 +30,8 @@
     <guava.version>23.5-jre</guava.version>
     <joda-time.version>2.9.9</joda-time.version>
     <hibernate-validation.version>5.4.1.Final</hibernate-validation.version>
-    <retrofit.version>2.3.0</retrofit.version>
+    <retrofit.version>2.4.0</retrofit.version>
+    <rxjava.version>2.2.2</rxjava.version>
     <maven.enforcer.version>1.4.1</maven.enforcer.version>
     <mainClass>io.serialized.samples.orderservice.OrderApplication</mainClass>
   </properties>
@@ -89,6 +90,17 @@
       <groupId>com.squareup.retrofit2</groupId>
       <artifactId>adapter-rxjava2</artifactId>
       <version>${retrofit.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>io.reactivex.rxjava2</groupId>
+          <artifactId>rxjava</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.reactivex.rxjava2</groupId>
+      <artifactId>rxjava</artifactId>
+      <version>${rxjava.version}</version>
     </dependency>
     <dependency>
       <groupId>com.squareup.retrofit2</groupId>
