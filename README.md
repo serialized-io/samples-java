@@ -1,4 +1,4 @@
-# Java samples for Serialized.io
+# Java samples for Serialized
 
 
 ## Request API-keys
@@ -117,4 +117,4 @@ curl http://localhost:8080/queries/total-customer-debt/
 
 Try out the other commands: `pay-order`, `ship-order` and `cancel-order`.
 
-See the details [here](https://bitbucket.org/serialized-io/samples-java/src/master/order-service/src/main/java/io/serialized/samples/orderservice/api/command) 
+See the details [here](https://github.com/serialized-io/samples-java/tree/master/order-service/src/main/java/io/serialized/samples/orderservice/api/command) 
