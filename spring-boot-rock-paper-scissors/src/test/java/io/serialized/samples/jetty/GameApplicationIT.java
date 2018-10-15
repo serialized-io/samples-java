@@ -4,6 +4,7 @@ import io.serialized.samples.rockpaperscissors.command.ShowHandCommand;
 import io.serialized.samples.rockpaperscissors.command.StartGameCommand;
 import io.serialized.samples.rockpaperscissors.domain.Answer;
 import io.serialized.samples.rockpaperscissors.query.HighScoreProjection;
+import io.serialized.samples.rockpaperscissors.query.TotalGameStats;
 import org.junit.Test;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
@@ -60,6 +61,14 @@ public class GameApplicationIT {
     HttpEntity<?> headers = new HttpEntity<>(clientHeaders());
     ResponseEntity<HighScoreProjection> exchange = restTemplate.exchange(LOCAL_SERVER + "/high-score", HttpMethod.GET, headers, HighScoreProjection.class);
     System.out.println("HighScoreProjection = " + exchange.getBody().highScores);
+  }
+
+  @Test
+  public void printTotalGameStats() {
+    RestTemplate restTemplate = new RestTemplate();
+    HttpEntity<?> headers = new HttpEntity<>(clientHeaders());
+    ResponseEntity<TotalGameStats> exchange = restTemplate.exchange(LOCAL_SERVER + "/stats", HttpMethod.GET, headers, TotalGameStats.class);
+    System.out.println("TotalGameStats = " + exchange.getBody());
   }
 
   private void startGame(String player1, String player2) {

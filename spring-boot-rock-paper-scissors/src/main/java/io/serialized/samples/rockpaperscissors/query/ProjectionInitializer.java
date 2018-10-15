@@ -32,7 +32,7 @@ public class ProjectionInitializer {
   public void totalStatsProjection() {
     ProjectionDefinition build = aggregatedProjection("total-game-stats")
         .feed("game")
-        .addHandler("GameStarted", inc("games"))
+        .addHandler("GameStarted", inc("gameCount"))
         .build();
     projectionApiClient.createOrUpdate(
         build);
