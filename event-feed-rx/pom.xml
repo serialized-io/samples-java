@@ -13,7 +13,7 @@
   <artifactId>event-feed-rx</artifactId>
 
   <properties>
-    <retrofit.version>2.3.0</retrofit.version>
+    <retrofit.version>2.5.0</retrofit.version>
   </properties>
 
   <dependencies>
