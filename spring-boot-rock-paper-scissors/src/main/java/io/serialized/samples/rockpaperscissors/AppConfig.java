@@ -16,8 +16,12 @@ public class AppConfig {
 
   private static final String GAME_AGGREGATE_TYPE = "game";
 
+  private final Environment env;
+
   @Autowired
-  Environment env;
+  public AppConfig(Environment env) {
+    this.env = env;
+  }
 
   @Bean
   public ProjectionClient projectionApiClient() {

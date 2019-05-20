@@ -14,8 +14,12 @@ import static io.serialized.client.projection.Selector.targetSelector;
 @Service
 public class ProjectionInitializer {
 
+  private final ProjectionClient projectionClient;
+
   @Autowired
-  ProjectionClient projectionClient;
+  public ProjectionInitializer(ProjectionClient projectionClient) {
+    this.projectionClient = projectionClient;
+  }
 
   public void createHighScoreProjection() {
     projectionClient.createOrUpdate(

@@ -14,8 +14,12 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @Controller
 public class GameQueryController {
 
+  private final ProjectionClient projectionClient;
+
   @Autowired
-  ProjectionClient projectionClient;
+  public GameQueryController(ProjectionClient projectionClient) {
+    this.projectionClient = projectionClient;
+  }
 
   @RequestMapping(value = "/high-score", method = GET, produces = "application/json")
   @ResponseBody

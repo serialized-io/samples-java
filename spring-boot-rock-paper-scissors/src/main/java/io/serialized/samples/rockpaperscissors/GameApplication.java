@@ -13,8 +13,12 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan
 public class GameApplication implements CommandLineRunner {
 
+  private final ProjectionInitializer configurer;
+
   @Autowired
-  ProjectionInitializer configurer;
+  public GameApplication(ProjectionInitializer configurer) {
+    this.configurer = configurer;
+  }
 
   @Override
   public void run(String... strings) {

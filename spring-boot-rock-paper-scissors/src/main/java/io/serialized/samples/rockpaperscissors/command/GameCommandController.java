@@ -22,8 +22,12 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @Controller
 public class GameCommandController {
 
+  private final AggregateClient<GameState> gameClient;
+
   @Autowired
-  AggregateClient<GameState> gameClient;
+  public GameCommandController(AggregateClient<GameState> gameClient) {
+    this.gameClient = gameClient;
+  }
 
   @RequestMapping(value = "/start-game", method = POST, consumes = "application/json")
   @ResponseStatus(value = HttpStatus.OK)
