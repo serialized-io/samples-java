@@ -14,20 +14,21 @@ import static io.serialized.samples.rockpaperscissors.domain.GameStatus.NEW;
  */
 public class GameState {
 
-  private String player1;
-  private String player2;
+  private Player player1;
+  private Player player2;
   private GameStatus status = NEW;
-  private List<Round> finishedRounds = new ArrayList<>();
   private Round currentRound = Round.NONE;
+  private List<Round> finishedRounds = new ArrayList<>();
 
   public static State<GameState> newGame() {
     return new State<>(0, new GameState());
   }
 
   public GameState gameStarted(Event<GameStarted> event) {
-    this.player1 = event.getData().player1;
-    this.player2 = event.getData().player2;
+    this.player1 = Player.fromString(event.getData().player1);
+    this.player2 = Player.fromString(event.getData().player2);
     this.status = GameStatus.STARTED;
+    this.currentRound = Round.newRound(player1, player2);
     return this;
   }
 
@@ -37,7 +38,7 @@ public class GameState {
   }
 
   public GameState playerAnswered(Event<PlayerAnswered> event) {
-    currentRound = currentRound.playerAnswered(event.getData().player, event.getData().answer);
+    currentRound = currentRound.playerAnswered(Player.fromString(event.getData().player), event.getData().answer);
     return this;
   }
 
@@ -68,11 +69,11 @@ public class GameState {
     return finishedRounds;
   }
 
-  public String player1() {
+  public Player player1() {
     return player1;
   }
 
-  public String player2() {
+  public Player player2() {
     return player2;
   }
 

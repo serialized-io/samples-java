@@ -31,17 +31,14 @@ public class GameTest {
   @Test
   public void testStartGame() {
 
-    String player1 = "Lisa";
-    String player2 = "Bob";
-
     Game game = gameFactory.fromCommands(Collections.emptyList());
 
-    List<Event> gameEvents = game.startGame(player1, player2);
+    List<Event> gameEvents = game.startGame(Player.fromString("Lisa"), Player.fromString("Bob"));
     assertThat(gameEvents.size(), is(2));
 
     Event<GameStarted> gameStarted = firstEventOfType(gameEvents, GameStarted.class);
-    assertThat(gameStarted.getData().player1, is(player1));
-    assertThat(gameStarted.getData().player2, is(player2));
+    assertThat(gameStarted.getData().player1, is("Lisa"));
+    assertThat(gameStarted.getData().player2, is("Bob"));
 
     Event<RoundStarted> roundStarted = firstEventOfType(gameEvents, RoundStarted.class);
     assertNotNull(roundStarted);
@@ -52,9 +49,9 @@ public class GameTest {
 
     Game game = gameFactory.fromCommands(
         // Start game
-        startGame("Lisa", "Bob"));
+        startGame(Player.fromString("Lisa"), Player.fromString("Bob")));
 
-    List<Event> gameEvents = game.showHand("Lisa", ROCK);
+    List<Event> gameEvents = game.showHand(Player.fromString("Lisa"), ROCK);
     assertThat(gameEvents.size(), is(1));
     Event<PlayerAnswered> playerAnswered = firstEventOfType(gameEvents, PlayerAnswered.class);
     assertThat(playerAnswered.getData().player, is("Lisa"));
@@ -66,12 +63,12 @@ public class GameTest {
 
     Game game = gameFactory.fromCommands(
         // Start game
-        startGame("Lisa", "Bob"),
+        startGame(Player.fromString("Lisa"), Player.fromString("Bob")),
 
         // Round 1
-        showHand("Lisa", ROCK));
+        showHand(Player.fromString("Lisa"), ROCK));
 
-    List<Event> gameEvents = game.showHand("Lisa", ROCK);
+    List<Event> gameEvents = game.showHand(Player.fromString("Lisa"), ROCK);
 
     assertThat(gameEvents.size(), is(0));
   }
@@ -81,12 +78,12 @@ public class GameTest {
 
     Game game = gameFactory.fromCommands(
         // Start game
-        startGame("Lisa", "Bob"),
+        startGame(Player.fromString("Lisa"), Player.fromString("Bob")),
 
         // Round 1
-        showHand("Lisa", ROCK));
+        showHand(Player.fromString("Lisa"), ROCK));
 
-    List<Event> gameEvents = game.showHand("Bob", PAPER);
+    List<Event> gameEvents = game.showHand(Player.fromString("Bob"), PAPER);
     assertThat(gameEvents.size(), is(3));
     Event<PlayerAnswered> playerAnswered = firstEventOfType(gameEvents, PlayerAnswered.class);
     assertThat(playerAnswered.getData().player, is("Bob"));
@@ -104,13 +101,13 @@ public class GameTest {
 
     Game game = gameFactory.fromCommands(
         // Start game
-        startGame("Lisa", "Bob"),
+        startGame(Player.fromString("Lisa"), Player.fromString("Bob")),
 
         // Round 1
-        showHand("Lisa", ROCK));
+        showHand(Player.fromString("Lisa"), ROCK));
 
 
-    List<Event> gameEvents = game.showHand("Bob", ROCK);
+    List<Event> gameEvents = game.showHand(Player.fromString("Bob"), ROCK);
 
     assertThat(gameEvents.size(), is(2));
     Event<PlayerAnswered> playerAnswered = firstEventOfType(gameEvents, PlayerAnswered.class);
@@ -126,20 +123,20 @@ public class GameTest {
 
     Game game = gameFactory.fromCommands(
         // Start game
-        startGame("Lisa", "Bob"),
+        startGame(Player.fromString("Lisa"), Player.fromString("Bob")),
 
         // Round 1
-        showHand("Lisa", ROCK),
-        showHand("Bob", PAPER),
+        showHand(Player.fromString("Lisa"), ROCK),
+        showHand(Player.fromString("Bob"), PAPER),
 
         // Round 2
-        showHand("Bob", ROCK),
-        showHand("Lisa", PAPER),
+        showHand(Player.fromString("Bob"), ROCK),
+        showHand(Player.fromString("Lisa"), PAPER),
 
         // Round 3
-        showHand("Lisa", ROCK));
+        showHand(Player.fromString("Lisa"), ROCK));
 
-    List<Event> gameEvents = game.showHand("Bob", PAPER);
+    List<Event> gameEvents = game.showHand(Player.fromString("Bob"), PAPER);
 
     assertThat(gameEvents.size(), is(3));
     Event<PlayerAnswered> playerAnswered = firstEventOfType(gameEvents, PlayerAnswered.class);
@@ -154,27 +151,27 @@ public class GameTest {
     assertThat(gameFinished.getData().winner, is("Bob"));
   }
 
-  private Command<Game> showHand(String player, Answer answer) {
+  private Command<Game> showHand(Player player, Answer answer) {
     return g -> g.showHand(player, answer);
   }
 
-  private Command<Game> startGame(String player1, String player2) {
+  private Command<Game> startGame(Player player1, Player player2) {
     return g -> g.startGame(player1, player2);
   }
 
   @Test
   public void winsAfterTwoRounds() {
-    Game game = gameFactory.fromCommands(g -> g.startGame("Lisa", "Bob"),
+    Game game = gameFactory.fromCommands(g -> g.startGame(Player.fromString("Lisa"), Player.fromString("Bob")),
         // Start game
-        showHand("Lisa", ROCK),
+        showHand(Player.fromString("Lisa"), ROCK),
 
         // Round 1
-        showHand("Bob", PAPER),
+        showHand(Player.fromString("Bob"), PAPER),
 
         // Round 2
-        showHand("Bob", PAPER));
+        showHand(Player.fromString("Bob"), PAPER));
 
-    List<Event> gameEvents = game.showHand("Lisa", ROCK);
+    List<Event> gameEvents = game.showHand(Player.fromString("Lisa"), ROCK);
     assertThat(gameEvents.size(), is(3));
 
     Event<GameFinished> gameFinished = firstEventOfType(gameEvents, GameFinished.class);

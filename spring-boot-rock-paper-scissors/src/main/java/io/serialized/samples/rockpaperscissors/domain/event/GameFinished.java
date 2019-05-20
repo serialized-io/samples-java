@@ -11,7 +11,7 @@ public class GameFinished {
 
   public static Event<GameFinished> gameFinished(GameScore gameScore) {
     GameFinished gameFinished = new GameFinished();
-    gameFinished.winner = gameScore.winner().orElseThrow(() -> new IllegalStateException("No winner was found"));
+    gameFinished.winner = gameScore.winner().map(p -> p.playerName).orElseThrow(() -> new IllegalStateException("No winner was found"));
     return newEvent(gameFinished).build();
   }
 

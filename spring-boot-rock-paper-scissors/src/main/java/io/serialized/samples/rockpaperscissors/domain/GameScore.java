@@ -12,9 +12,9 @@ import static java.util.stream.Collectors.groupingBy;
  */
 public class GameScore extends ValueObject {
 
-  private final List<RoundResult> rounds;
+  private final List<Result> rounds;
 
-  private GameScore(List<RoundResult> rounds) {
+  private GameScore(List<Result> rounds) {
     this.rounds = rounds;
   }
 
@@ -29,7 +29,7 @@ public class GameScore extends ValueObject {
    * @return the new score
    */
   GameScore addRound(Round round) {
-    ArrayList<RoundResult> results = new ArrayList<>(rounds);
+    ArrayList<Result> results = new ArrayList<>(rounds);
     results.add(round.result());
     return new GameScore(results);
   }
@@ -38,11 +38,11 @@ public class GameScore extends ValueObject {
     return gameScore().entrySet().stream().anyMatch(e -> e.getValue() >= 2);
   }
 
-  private Map<String, Long> gameScore() {
-    Map<String, Long> results = new HashMap<>();
-    results.put(rounds.get(0).loser(), 0L);
-    results.put(rounds.get(0).winner(), 0L);
-    Map<String, Long> wins = rounds.stream().collect(groupingBy(RoundResult::winner, counting()));
+  private Map<Player, Long> gameScore() {
+    Map<Player, Long> results = new HashMap<>();
+    results.put(rounds.get(0).loser().get(), 0L);
+    results.put(rounds.get(0).winner().get(), 0L);
+    Map<Player, Long> wins = rounds.stream().collect(groupingBy(r -> r.winner().get(), counting()));
     results.putAll(wins);
     return results;
   }
@@ -51,10 +51,10 @@ public class GameScore extends ValueObject {
    * @return the winner of the Game, if one exists.
    * @throws IllegalStateException if the Game does not have a winner.
    */
-  public Optional<String> winner() {
-    Map<String, Long> wins = rounds.stream().collect(groupingBy(RoundResult::winner, counting()));
+  public Optional<Player> winner() {
+    Map<Player, Long> wins = rounds.stream().collect(groupingBy(r -> r.winner().get(), counting()));
 
-    LinkedHashMap<String, Long> sortedMap = new LinkedHashMap<>();
+    LinkedHashMap<Player, Long> sortedMap = new LinkedHashMap<>();
     wins.entrySet()
         .stream()
         .sorted(Map.Entry.comparingByValue(reverseOrder()))

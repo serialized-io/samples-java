@@ -13,7 +13,6 @@ import static io.serialized.samples.rockpaperscissors.domain.event.RoundFinished
 import static io.serialized.samples.rockpaperscissors.domain.event.RoundStarted.roundStarted;
 import static io.serialized.samples.rockpaperscissors.domain.event.RoundTied.roundTied;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 
 /**
  * Game is our aggregate root.
@@ -32,24 +31,21 @@ public class Game {
     return new Game(state.data());
   }
 
-  public List<Event> startGame(String player1, String player2) {
+  public List<Event> startGame(Player player1, Player player2) {
     return asList(
         gameStarted(player1, player2),
         roundStarted(player1, player2)
     );
   }
 
-  public List<Event> showHand(String player, Answer answer) {
+  public List<Event> showHand(Player player, Answer answer) {
+    gameState.assertAllowsMoreAnswers();
 
-    if (isNewAnswer(player, answer)) {
+    List<Event> events = new ArrayList<>();
 
-      // Validate
-      gameState.assertAllowsMoreAnswers();
-      answer.assertValid();
+    Round round = gameState.currentRound().playerAnswered(player, answer);
+    if (!gameState.currentRound().hasPlayerAnswered(player)) {
 
-      List<Event> events = new ArrayList<>();
-
-      Round round = gameState.currentRound().playerAnswered(player, answer);
       events.add(playerAnswered(player, answer));
 
       if (round.isTied()) {
@@ -65,22 +61,9 @@ public class Game {
         } else {
           events.add(roundStarted(gameState.player1(), gameState.player2()));
         }
-
       }
-      return events;
-    } else {
-      return emptyList();
     }
-
+    return events;
   }
-
-  private Answer currentAnswerForPlayer(String player) {
-    return gameState.currentRound().answerForPlayer(player);
-  }
-
-  private boolean isNewAnswer(String player, Answer answer) {
-    return !answer.equals(currentAnswerForPlayer(player));
-  }
-
 
 }

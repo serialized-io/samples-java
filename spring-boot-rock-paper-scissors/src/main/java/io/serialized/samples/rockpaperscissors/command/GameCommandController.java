@@ -6,6 +6,7 @@ import io.serialized.client.aggregate.EventBatch;
 import io.serialized.client.aggregate.State;
 import io.serialized.samples.rockpaperscissors.domain.Game;
 import io.serialized.samples.rockpaperscissors.domain.GameState;
+import io.serialized.samples.rockpaperscissors.domain.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -30,7 +31,7 @@ public class GameCommandController {
 
     State<GameState> state = GameState.newGame();
 
-    List<Event> events = Game.fromState(state).startGame(request.player1, request.player2);
+    List<Event> events = Game.fromState(state).startGame(Player.fromString(request.player1), Player.fromString(request.player2));
 
     EventBatch eventBatch = newBatch(request.gameId)
         .withExpectedVersion(0)
@@ -49,7 +50,7 @@ public class GameCommandController {
 
     // Initialize our aggregate root with the current state
     // Execute domain logic
-    List<Event> events = Game.fromState(gameState).showHand(request.player, request.answer);
+    List<Event> events = Game.fromState(gameState).showHand(Player.fromString(request.player), request.answer);
 
     EventBatch eventBatch = newBatch(gameId)
         .withExpectedVersion(gameState.aggregateVersion())
