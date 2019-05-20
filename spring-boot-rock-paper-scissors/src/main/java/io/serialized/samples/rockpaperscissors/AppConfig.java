@@ -1,9 +1,9 @@
 package io.serialized.samples.rockpaperscissors;
 
 import io.serialized.client.SerializedClientConfig;
-import io.serialized.client.aggregates.AggregateClient;
-import io.serialized.client.feed.FeedApiClient;
-import io.serialized.client.projection.ProjectionApiClient;
+import io.serialized.client.aggregate.AggregateClient;
+import io.serialized.client.feed.FeedClient;
+import io.serialized.client.projection.ProjectionClient;
 import io.serialized.samples.rockpaperscissors.domain.GameState;
 import io.serialized.samples.rockpaperscissors.domain.event.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +20,8 @@ public class AppConfig {
   Environment env;
 
   @Bean
-  public ProjectionApiClient projectionApiClient() {
-    return ProjectionApiClient.projectionsClient(getConfig()).build();
+  public ProjectionClient projectionApiClient() {
+    return ProjectionClient.projectionClient(getConfig()).build();
   }
 
   @Bean
@@ -37,8 +37,8 @@ public class AppConfig {
   }
 
   @Bean
-  public FeedApiClient feedApiClient() {
-    return FeedApiClient.feedClient(getConfig()).build();
+  public FeedClient feedApiClient() {
+    return FeedClient.feedClient(getConfig()).build();
   }
 
   private SerializedClientConfig getConfig() {

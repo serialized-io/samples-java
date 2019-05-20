@@ -1,7 +1,7 @@
 package io.serialized.samples.rockpaperscissors.domain;
 
-import io.serialized.client.aggregates.Event;
-import io.serialized.client.aggregates.State;
+import io.serialized.client.aggregate.Event;
+import io.serialized.client.aggregate.State;
 import io.serialized.samples.rockpaperscissors.domain.event.*;
 
 import java.util.ArrayList;
@@ -25,8 +25,8 @@ public class GameState {
   }
 
   public GameState gameStarted(Event<GameStarted> event) {
-    this.player1 = event.data().player1;
-    this.player2 = event.data().player2;
+    this.player1 = event.getData().player1;
+    this.player2 = event.getData().player2;
     this.status = GameStatus.STARTED;
     return this;
   }
@@ -37,7 +37,7 @@ public class GameState {
   }
 
   public GameState playerAnswered(Event<PlayerAnswered> event) {
-    currentRound = currentRound.playerAnswered(event.data().player, event.data().answer);
+    currentRound = currentRound.playerAnswered(event.getData().player, event.getData().answer);
     return this;
   }
 

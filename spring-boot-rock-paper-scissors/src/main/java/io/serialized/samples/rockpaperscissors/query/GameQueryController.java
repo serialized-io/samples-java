@@ -1,6 +1,6 @@
 package io.serialized.samples.rockpaperscissors.query;
 
-import io.serialized.client.projection.ProjectionApiClient;
+import io.serialized.client.projection.ProjectionClient;
 import io.serialized.client.projection.ProjectionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,18 +15,18 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 public class GameQueryController {
 
   @Autowired
-  ProjectionApiClient projectionApiClient;
+  ProjectionClient projectionClient;
 
   @RequestMapping(value = "/high-score", method = GET, produces = "application/json")
   @ResponseBody
   public HighScoreProjection highScore() {
-    return HighScoreProjection.fromProjections(projectionApiClient.list(list("high-score").build(HighScore.class)));
+    return HighScoreProjection.fromProjections(projectionClient.list(list("high-score").build(HighScore.class)));
   }
 
   @RequestMapping(value = "/stats", method = GET, produces = "application/json")
   @ResponseBody
   public TotalGameStats gameStats() {
-    ProjectionResponse<TotalGameStats> projection = projectionApiClient.query(aggregated("total-game-stats").build(TotalGameStats.class));
+    ProjectionResponse<TotalGameStats> projection = projectionClient.query(aggregated("total-game-stats").build(TotalGameStats.class));
     return projection.data;
   }
 

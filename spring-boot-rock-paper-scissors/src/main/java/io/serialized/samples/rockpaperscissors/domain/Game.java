@@ -1,7 +1,7 @@
 package io.serialized.samples.rockpaperscissors.domain;
 
-import io.serialized.client.aggregates.Event;
-import io.serialized.client.aggregates.State;
+import io.serialized.client.aggregate.Event;
+import io.serialized.client.aggregate.State;
 
 import java.util.ArrayList;
 import java.util.List;

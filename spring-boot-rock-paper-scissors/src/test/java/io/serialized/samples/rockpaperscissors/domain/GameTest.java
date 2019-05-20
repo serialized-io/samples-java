@@ -1,9 +1,9 @@
 package io.serialized.samples.rockpaperscissors.domain;
 
-import io.serialized.client.aggregates.AggregateFactory;
-import io.serialized.client.aggregates.Command;
-import io.serialized.client.aggregates.Event;
-import io.serialized.client.aggregates.StateBuilder;
+import io.serialized.client.aggregate.AggregateFactory;
+import io.serialized.client.aggregate.Command;
+import io.serialized.client.aggregate.Event;
+import io.serialized.client.aggregate.StateBuilder;
 import io.serialized.samples.rockpaperscissors.domain.event.*;
 import org.junit.Test;
 
@@ -40,8 +40,8 @@ public class GameTest {
     assertThat(gameEvents.size(), is(2));
 
     Event<GameStarted> gameStarted = firstEventOfType(gameEvents, GameStarted.class);
-    assertThat(gameStarted.data().player1, is(player1));
-    assertThat(gameStarted.data().player2, is(player2));
+    assertThat(gameStarted.getData().player1, is(player1));
+    assertThat(gameStarted.getData().player2, is(player2));
 
     Event<RoundStarted> roundStarted = firstEventOfType(gameEvents, RoundStarted.class);
     assertNotNull(roundStarted);
@@ -57,8 +57,8 @@ public class GameTest {
     List<Event> gameEvents = game.showHand("Lisa", ROCK);
     assertThat(gameEvents.size(), is(1));
     Event<PlayerAnswered> playerAnswered = firstEventOfType(gameEvents, PlayerAnswered.class);
-    assertThat(playerAnswered.data().player, is("Lisa"));
-    assertThat(playerAnswered.data().answer, is(ROCK));
+    assertThat(playerAnswered.getData().player, is("Lisa"));
+    assertThat(playerAnswered.getData().answer, is(ROCK));
   }
 
   @Test
@@ -89,12 +89,12 @@ public class GameTest {
     List<Event> gameEvents = game.showHand("Bob", PAPER);
     assertThat(gameEvents.size(), is(3));
     Event<PlayerAnswered> playerAnswered = firstEventOfType(gameEvents, PlayerAnswered.class);
-    assertThat(playerAnswered.data().player, is("Bob"));
-    assertThat(playerAnswered.data().answer, is(PAPER));
+    assertThat(playerAnswered.getData().player, is("Bob"));
+    assertThat(playerAnswered.getData().answer, is(PAPER));
 
     Event<RoundFinished> roundFinished = firstEventOfType(gameEvents, RoundFinished.class);
-    assertThat(roundFinished.data().winner, is("Bob"));
-    assertThat(roundFinished.data().loser, is("Lisa"));
+    assertThat(roundFinished.getData().winner, is("Bob"));
+    assertThat(roundFinished.getData().loser, is("Lisa"));
     Event<RoundStarted> roundStarted = firstEventOfType(gameEvents, RoundStarted.class);
     assertNotNull(roundStarted);
   }
@@ -114,11 +114,11 @@ public class GameTest {
 
     assertThat(gameEvents.size(), is(2));
     Event<PlayerAnswered> playerAnswered = firstEventOfType(gameEvents, PlayerAnswered.class);
-    assertThat(playerAnswered.data().player, is("Bob"));
-    assertThat(playerAnswered.data().answer, is(ROCK));
+    assertThat(playerAnswered.getData().player, is("Bob"));
+    assertThat(playerAnswered.getData().answer, is(ROCK));
 
     Event<RoundTied> roundTIed = firstEventOfType(gameEvents, RoundTied.class);
-    assertThat(roundTIed.data().answer, is(ROCK));
+    assertThat(roundTIed.getData().answer, is(ROCK));
   }
 
   @Test
@@ -143,15 +143,15 @@ public class GameTest {
 
     assertThat(gameEvents.size(), is(3));
     Event<PlayerAnswered> playerAnswered = firstEventOfType(gameEvents, PlayerAnswered.class);
-    assertThat(playerAnswered.data().player, is("Bob"));
-    assertThat(playerAnswered.data().answer, is(PAPER));
+    assertThat(playerAnswered.getData().player, is("Bob"));
+    assertThat(playerAnswered.getData().answer, is(PAPER));
 
     Event<RoundFinished> roundFinished = firstEventOfType(gameEvents, RoundFinished.class);
-    assertThat(roundFinished.data().winner, is("Bob"));
-    assertThat(roundFinished.data().loser, is("Lisa"));
+    assertThat(roundFinished.getData().winner, is("Bob"));
+    assertThat(roundFinished.getData().loser, is("Lisa"));
 
     Event<GameFinished> gameFinished = firstEventOfType(gameEvents, GameFinished.class);
-    assertThat(gameFinished.data().winner, is("Bob"));
+    assertThat(gameFinished.getData().winner, is("Bob"));
   }
 
   private Command<Game> showHand(String player, Answer answer) {
@@ -178,12 +178,12 @@ public class GameTest {
     assertThat(gameEvents.size(), is(3));
 
     Event<GameFinished> gameFinished = firstEventOfType(gameEvents, GameFinished.class);
-    assertThat(gameFinished.data().winner, is("Bob"));
+    assertThat(gameFinished.getData().winner, is("Bob"));
   }
 
   private <T> Event<T> firstEventOfType(List<Event> gameEvents, Class<T> clazz) {
     return (Event<T>) gameEvents.stream()
-        .filter(e -> e.eventType().equals(clazz.getSimpleName())).findFirst()
+        .filter(e -> e.getEventType().equals(clazz.getSimpleName())).findFirst()
         .orElseThrow(() -> new RuntimeException("Missing event"));
   }
 

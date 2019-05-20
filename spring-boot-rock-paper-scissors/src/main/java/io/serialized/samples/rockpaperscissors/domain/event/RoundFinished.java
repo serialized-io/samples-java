@@ -1,9 +1,9 @@
 package io.serialized.samples.rockpaperscissors.domain.event;
 
-import io.serialized.client.aggregates.Event;
+import io.serialized.client.aggregate.Event;
 import io.serialized.samples.rockpaperscissors.domain.RoundResult;
 
-import static io.serialized.client.aggregates.Event.newEvent;
+import static io.serialized.client.aggregate.Event.newEvent;
 
 public class RoundFinished {
 

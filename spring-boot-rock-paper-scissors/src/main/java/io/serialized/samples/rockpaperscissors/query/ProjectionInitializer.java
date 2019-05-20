@@ -1,6 +1,6 @@
 package io.serialized.samples.rockpaperscissors.query;
 
-import io.serialized.client.projection.ProjectionApiClient;
+import io.serialized.client.projection.ProjectionClient;
 import io.serialized.client.projection.ProjectionDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,10 +15,10 @@ import static io.serialized.client.projection.Selector.targetSelector;
 public class ProjectionInitializer {
 
   @Autowired
-  ProjectionApiClient projectionApiClient;
+  ProjectionClient projectionClient;
 
   public void createHighScoreProjection() {
-    projectionApiClient.createOrUpdate(
+    projectionClient.createOrUpdate(
         singleProjection("high-score")
             .feed("game")
             .withIdField("winner")
@@ -34,7 +34,7 @@ public class ProjectionInitializer {
         .feed("game")
         .addHandler("GameStarted", inc("gameCount"))
         .build();
-    projectionApiClient.createOrUpdate(
+    projectionClient.createOrUpdate(
         build);
   }
 
