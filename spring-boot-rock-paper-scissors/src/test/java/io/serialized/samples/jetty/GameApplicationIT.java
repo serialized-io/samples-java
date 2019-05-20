@@ -15,7 +15,8 @@ import java.util.UUID;
 public class GameApplicationIT {
 
   public static final String LOCAL_SERVER = "http://localhost:8080";
-  public static final String GAME_ID = UUID.randomUUID().toString();
+  private final String gameId = UUID.randomUUID().toString();
+
 
   @Test
   public void bobWins() {
@@ -73,7 +74,7 @@ public class GameApplicationIT {
 
   private void startGame(String player1, String player2) {
     StartGameCommand startGameRequest = new StartGameCommand();
-    startGameRequest.gameId = GAME_ID;
+    startGameRequest.gameId = gameId;
     startGameRequest.player1 = player1;
     startGameRequest.player2 = player2;
 
@@ -85,7 +86,7 @@ public class GameApplicationIT {
   private void showHand(String player, Answer answer) {
     RestTemplate restTemplate = new RestTemplate();
     ShowHandCommand showHandRequest = new ShowHandCommand();
-    showHandRequest.gameId = GAME_ID;
+    showHandRequest.gameId = gameId;
     showHandRequest.player = player;
     showHandRequest.answer = answer;
     HttpEntity<?> entity2 = new HttpEntity<>(showHandRequest, clientHeaders());
