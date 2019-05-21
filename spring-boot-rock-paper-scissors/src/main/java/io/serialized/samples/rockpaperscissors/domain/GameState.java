@@ -57,10 +57,6 @@ public class GameState {
     return this;
   }
 
-  public GameStatus status() {
-    return status;
-  }
-
   public Round currentRound() {
     return currentRound;
   }

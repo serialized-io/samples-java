@@ -33,9 +33,11 @@ public class GameCommandController {
   @ResponseStatus(value = HttpStatus.OK)
   public void startGame(@RequestBody StartGameCommand request) {
 
+    Player player1 = Player.fromString(request.player1);
+    Player player2 = Player.fromString(request.player2);
     State<GameState> state = GameState.newGame();
 
-    List<Event> events = Game.fromState(state).startGame(Player.fromString(request.player1), Player.fromString(request.player2));
+    List<Event> events = Game.fromState(state).startGame(player1, player2);
 
     EventBatch eventBatch = newBatch(request.gameId)
         .withExpectedVersion(0)
