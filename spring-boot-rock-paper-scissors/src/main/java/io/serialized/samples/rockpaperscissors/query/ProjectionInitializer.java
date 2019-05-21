@@ -1,7 +1,6 @@
 package io.serialized.samples.rockpaperscissors.query;
 
 import io.serialized.client.projection.ProjectionClient;
-import io.serialized.client.projection.ProjectionDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,12 +33,10 @@ public class ProjectionInitializer {
   }
 
   public void totalStatsProjection() {
-    ProjectionDefinition build = aggregatedProjection("total-game-stats")
+    projectionClient.createOrUpdate(aggregatedProjection("total-game-stats")
         .feed("game")
         .addHandler("GameStarted", inc("gameCount"))
-        .build();
-    projectionClient.createOrUpdate(
-        build);
+        .build());
   }
 
 }
