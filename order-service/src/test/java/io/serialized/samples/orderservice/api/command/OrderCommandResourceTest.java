@@ -6,6 +6,7 @@ import io.dropwizard.testing.junit.DropwizardClientRule;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import io.serialized.samples.order.domain.Amount;
 import io.serialized.samples.order.domain.CustomerId;
+import io.serialized.samples.order.domain.OrderId;
 import io.serialized.samples.orderservice.integration.EventStoreService;
 import io.serialized.samples.orderservice.integration.OrderAggregate;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
@@ -120,7 +121,7 @@ public class OrderCommandResourceTest {
     OrderAggregate aggregate = new OrderAggregate();
     aggregate.aggregateId = request.orderId;
     aggregate.aggregateVersion = 1;
-    aggregate.events = ImmutableList.of(orderPlaced(CustomerId.newCustomer(), new Amount(1234L)));
+    aggregate.events = ImmutableList.of(orderPlaced(new OrderId(request.orderId), CustomerId.newCustomerId(), new Amount(1234L)));
     when(EVENT_STORE.loadOrder(request.orderId)).thenReturn(aggregate);
 
     // when
@@ -143,7 +144,7 @@ public class OrderCommandResourceTest {
     OrderAggregate aggregate = new OrderAggregate();
     aggregate.aggregateId = request.orderId;
     aggregate.aggregateVersion = 1;
-    aggregate.events = ImmutableList.of(orderPlaced(CustomerId.newCustomer(), new Amount(1234L)));
+    aggregate.events = ImmutableList.of(orderPlaced(new OrderId(request.orderId), CustomerId.newCustomerId(), new Amount(1234L)));
     when(EVENT_STORE.loadOrder(request.orderId)).thenReturn(aggregate);
 
     // when
@@ -163,14 +164,15 @@ public class OrderCommandResourceTest {
     request.orderId = newId();
     request.trackingNumber = UUID.randomUUID().toString();
 
-    CustomerId customerId = CustomerId.newCustomer();
+    OrderId orderId = new OrderId(request.orderId);
+    CustomerId customerId = CustomerId.newCustomerId();
 
     OrderAggregate aggregate = new OrderAggregate();
     aggregate.aggregateId = request.orderId;
     aggregate.aggregateVersion = 1;
     aggregate.events = ImmutableList.of(
-        orderPlaced(customerId, new Amount(1234L)),
-        orderFullyPaid(customerId)
+        orderPlaced(orderId, customerId, new Amount(1234L)),
+        orderFullyPaid(orderId, customerId)
     );
     when(EVENT_STORE.loadOrder(request.orderId)).thenReturn(aggregate);
 
@@ -194,7 +196,7 @@ public class OrderCommandResourceTest {
     OrderAggregate aggregate = new OrderAggregate();
     aggregate.aggregateId = request.orderId;
     aggregate.aggregateVersion = 1;
-    aggregate.events = ImmutableList.of(orderPlaced(CustomerId.newCustomer(), new Amount(1234L)));
+    aggregate.events = ImmutableList.of(orderPlaced(new OrderId(request.orderId), CustomerId.newCustomerId(), new Amount(1234L)));
     when(EVENT_STORE.loadOrder(request.orderId)).thenReturn(aggregate);
 
     // when
@@ -219,7 +221,7 @@ public class OrderCommandResourceTest {
     OrderAggregate aggregate = new OrderAggregate();
     aggregate.aggregateId = request.orderId;
     aggregate.aggregateVersion = 1;
-    aggregate.events = ImmutableList.of(orderPlaced(CustomerId.newCustomer(), new Amount(1234L)));
+    aggregate.events = ImmutableList.of(orderPlaced(new OrderId(request.orderId), CustomerId.newCustomerId(), new Amount(1234L)));
     when(EVENT_STORE.loadOrder(request.orderId)).thenReturn(aggregate);
 
     // when

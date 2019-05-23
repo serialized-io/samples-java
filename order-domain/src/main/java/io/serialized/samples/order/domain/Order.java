@@ -17,15 +17,17 @@ import static io.serialized.samples.order.domain.event.PaymentReceivedEvent.paym
 
 public class Order {
 
+  private final OrderId orderId;
   private final CustomerId customerId;
   private final OrderStatus status;
   private final Amount orderAmount;
 
-  public static Order createNewOrder(CustomerId customerId) {
-    return new Order(customerId, OrderStatus.NEW, Amount.ZERO);
+  public static Order createNewOrder(OrderId orderId, CustomerId customerId) {
+    return new Order(orderId, customerId, OrderStatus.NEW, Amount.ZERO);
   }
 
-  public Order(CustomerId customerId, OrderStatus status, Amount orderAmount) {
+  public Order(OrderId orderId, CustomerId customerId, OrderStatus status, Amount orderAmount) {
+    this.orderId = orderId;
     this.customerId = customerId;
     this.status = status;
     this.orderAmount = orderAmount;
@@ -33,17 +35,17 @@ public class Order {
 
   public OrderPlacedEvent place(Amount orderAmount) {
     status.assertNotYetPlaced();
-    return orderPlaced(customerId, orderAmount);
+    return orderPlaced(orderId, customerId, orderAmount);
   }
 
   public List<OrderEvent> pay(Amount amount) {
     status.assertPlaced();
     checkArgument(amount.isPositive());
     List<OrderEvent> events = new ArrayList<>();
-    events.add(paymentReceived(customerId, amount));
+    events.add(paymentReceived(orderId, customerId, amount));
 
     if (amount.largerThanEq(orderAmount)) {
-      events.add(orderFullyPaid(customerId));
+      events.add(orderFullyPaid(orderId, customerId));
     }
 
     return events;
@@ -51,12 +53,12 @@ public class Order {
 
   public OrderShippedEvent ship(TrackingNumber trackingNumber) {
     status.assertPaid();
-    return orderShipped(customerId, trackingNumber);
+    return orderShipped(orderId, customerId, trackingNumber);
   }
 
   public OrderCancelledEvent cancel(String reason) {
     status.assertPlaced();
-    return orderCancelled(customerId, orderAmount, reason);
+    return orderCancelled(orderId, customerId, orderAmount, reason);
   }
 
 }

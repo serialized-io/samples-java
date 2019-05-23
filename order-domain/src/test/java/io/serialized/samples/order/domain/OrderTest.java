@@ -6,7 +6,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static com.google.common.base.Predicates.instanceOf;
-import static io.serialized.samples.order.domain.CustomerId.newCustomer;
+import static io.serialized.samples.order.domain.CustomerId.newCustomerId;
 import static io.serialized.samples.order.domain.Order.createNewOrder;
 import static io.serialized.samples.order.domain.OrderId.newOrderId;
 import static io.serialized.samples.order.domain.event.OrderFullyPaidEvent.orderFullyPaid;
@@ -19,7 +19,9 @@ public class OrderTest {
 
   @Test
   public void placeNewOrderGeneratesEvent() {
-    Order order = createNewOrder(newCustomer());
+    OrderId orderId = newOrderId();
+    CustomerId customerId = newCustomerId();
+    Order order = createNewOrder(orderId, customerId);
     OrderPlacedEvent placedEvent = order.place(new Amount(200));
     assertThat(placedEvent.data.orderAmount, is(200L));
   }
@@ -27,12 +29,14 @@ public class OrderTest {
   @Test
   public void payCorrectAmount() {
 
-    CustomerId customerId = newCustomer();
-    OrderState state = OrderState.builder(newOrderId())
-        .apply(orderPlaced(customerId, new Amount(200)))
+    OrderId orderId = newOrderId();
+    CustomerId customerId = newCustomerId();
+
+    OrderState state = OrderState.builder(orderId)
+        .apply(orderPlaced(orderId, customerId, new Amount(200)))
         .build();
 
-    Order order = new Order(customerId, state.orderStatus, state.orderAmount);
+    Order order = new Order(orderId, customerId, state.orderStatus, state.orderAmount);
     List<OrderEvent> events = order.pay(new Amount(200));
 
     assertThat(events.stream().filter(instanceOf(PaymentReceivedEvent.class)::apply).count(), is(1L));
@@ -42,12 +46,14 @@ public class OrderTest {
   @Test
   public void payWithExceedingAmount() {
 
-    CustomerId customerId = newCustomer();
-    OrderState state = OrderState.builder(newOrderId())
-        .apply(orderPlaced(customerId, new Amount(200)))
+    OrderId orderId = newOrderId();
+    CustomerId customerId = newCustomerId();
+
+    OrderState state = OrderState.builder(orderId)
+        .apply(orderPlaced(orderId, customerId, new Amount(200)))
         .build();
 
-    Order order = new Order(customerId, state.orderStatus, state.orderAmount);
+    Order order = new Order(orderId, customerId, state.orderStatus, state.orderAmount);
     List<OrderEvent> events = order.pay(new Amount(500));
 
     assertThat(events.stream().filter(instanceOf(PaymentReceivedEvent.class)::apply).count(), is(1L));
@@ -57,43 +63,51 @@ public class OrderTest {
   @Test(expected = IllegalOrderStateException.class)
   public void cannotPayNewOrder() {
 
-    OrderState state = OrderState.builder(newOrderId()).build();
+    OrderId orderId = newOrderId();
+    CustomerId customerId = newCustomerId();
 
-    Order order = new Order(newCustomer(), state.orderStatus, state.orderAmount);
+    OrderState state = OrderState.builder(orderId).build();
+
+    Order order = new Order(orderId, customerId, state.orderStatus, state.orderAmount);
     order.pay(new Amount(200));
   }
 
   @Test(expected = IllegalOrderStateException.class)
   public void cannotShipUnpaidOrder() {
 
-    CustomerId customerId = newCustomer();
-    OrderState state = OrderState.builder(newOrderId())
-        .apply(orderPlaced(customerId, new Amount(200)))
+    OrderId orderId = newOrderId();
+    CustomerId customerId = newCustomerId();
+
+    OrderState state = OrderState.builder(orderId)
+        .apply(orderPlaced(orderId, customerId, new Amount(200)))
         .build();
 
-    Order order = new Order(customerId, state.orderStatus, state.orderAmount);
+    Order order = new Order(orderId, customerId, state.orderStatus, state.orderAmount);
     order.ship(TrackingNumber.newTrackingNumber());
   }
 
   @Test(expected = IllegalOrderStateException.class)
   public void cannotCancelOrderNotPlaced() {
 
-    OrderState state = OrderState.builder(newOrderId())
+    OrderId orderId = newOrderId();
+    OrderState state = OrderState.builder(orderId)
         .build();
 
-    Order order = new Order(newCustomer(), state.orderStatus, state.orderAmount);
+    Order order = new Order(orderId, newCustomerId(), state.orderStatus, state.orderAmount);
     order.cancel("DOA");
   }
 
   @Test
   public void canCancelPlacedOrder() {
 
-    CustomerId customerId = newCustomer();
-    OrderState state = OrderState.builder(newOrderId())
-        .apply(orderPlaced(customerId, new Amount(200)))
+    OrderId orderId = newOrderId();
+    CustomerId customerId = newCustomerId();
+
+    OrderState state = OrderState.builder(orderId)
+        .apply(orderPlaced(orderId, customerId, new Amount(200)))
         .build();
 
-    Order order = new Order(customerId, state.orderStatus, state.orderAmount);
+    Order order = new Order(orderId, customerId, state.orderStatus, state.orderAmount);
     String reason = "DOA";
     OrderCancelledEvent cancelledEvent = order.cancel(reason);
     assertThat(cancelledEvent.data.reason, is(reason));
@@ -102,14 +116,16 @@ public class OrderTest {
   @Test
   public void canShipPaidOrder() {
 
-    CustomerId customerId = newCustomer();
-    OrderState state = OrderState.builder(newOrderId())
-        .apply(orderPlaced(customerId, new Amount(200)))
-        .apply(paymentReceived(customerId, new Amount(200L)))
-        .apply(orderFullyPaid(customerId))
+    OrderId orderId = newOrderId();
+    CustomerId customerId = newCustomerId();
+
+    OrderState state = OrderState.builder(orderId)
+        .apply(orderPlaced(orderId, customerId, new Amount(200)))
+        .apply(paymentReceived(orderId, customerId, new Amount(200L)))
+        .apply(orderFullyPaid(orderId, customerId))
         .build();
 
-    Order order = new Order(customerId, state.orderStatus, state.orderAmount);
+    Order order = new Order(orderId, customerId, state.orderStatus, state.orderAmount);
     TrackingNumber trackingNumber = TrackingNumber.newTrackingNumber();
     OrderShippedEvent shippedEvent = order.ship(trackingNumber);
     assertThat(shippedEvent.data.trackingNumber, is(trackingNumber.trackingNumber));

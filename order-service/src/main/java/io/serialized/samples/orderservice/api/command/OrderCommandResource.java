@@ -56,10 +56,10 @@ public class OrderCommandResource {
     Observable<EventBatch> eventBatch = Observable.fromCallable(() -> {
       CustomerId customerId = new CustomerId(request.customerId);
       Amount orderAmount = new Amount(request.orderAmount);
-      Order order = Order.createNewOrder(customerId);
+      Order order = Order.createNewOrder(orderId, customerId);
       logger.info("Placing order: {}", orderId);
       OrderPlacedEvent event = order.place(orderAmount);
-      return new EventBatch(orderId.id, ImmutableList.of(event));
+      return new EventBatch(orderId, ImmutableList.of(event));
     });
     saveEventsAndResume(eventBatch, asyncResponse, throwable -> false);
   }
@@ -68,14 +68,14 @@ public class OrderCommandResource {
   @Path("pay-order")
   public void payOrder(@Valid @NotNull PayOrderRequest request, @Suspended AsyncResponse asyncResponse) {
     OrderId orderId = new OrderId(request.orderId);
-    Observable<EventBatch> eventBatch = eventStoreService.loadOrder(orderId.toString())
+    Observable<EventBatch> eventBatch = eventStoreService.loadOrder(orderId.id)
         .map(aggregate -> loadFromEvents(orderId, aggregate.aggregateVersion, aggregate.events))
         .map(orderState -> {
-          Order order = new Order(orderState.customerId, orderState.orderStatus, orderState.orderAmount);
+          Order order = new Order(orderState.orderId, orderState.customerId, orderState.orderStatus, orderState.orderAmount);
           Amount amount = new Amount(request.amount);
-          logger.info("Paying [{}] for order: {}", amount, orderId);
+          logger.info("Paying [{}] for order: {}", amount, orderState.orderId.id);
           List<OrderEvent> events = order.pay(amount);
-          return new EventBatch(orderId.id, orderState.version, events);
+          return new EventBatch(orderState.orderId, orderState.version, events);
         });
     saveEventsAndResume(eventBatch, asyncResponse, this::isHttpConflict);
   }
@@ -84,14 +84,14 @@ public class OrderCommandResource {
   @Path("ship-order")
   public void shipOrder(@Valid @NotNull ShipOrderRequest request, @Suspended AsyncResponse asyncResponse) {
     OrderId orderId = new OrderId(request.orderId);
-    Observable<EventBatch> eventBatch = eventStoreService.loadOrder(orderId.toString())
+    Observable<EventBatch> eventBatch = eventStoreService.loadOrder(orderId.id)
         .map(aggregate -> loadFromEvents(orderId, aggregate.aggregateVersion, aggregate.events))
         .map(orderState -> {
-          Order order = new Order(orderState.customerId, orderState.orderStatus, orderState.orderAmount);
+          Order order = new Order(orderState.orderId, orderState.customerId, orderState.orderStatus, orderState.orderAmount);
           TrackingNumber trackingNumber = new TrackingNumber(request.trackingNumber);
-          logger.info("Shipping order: {}", orderId);
+          logger.info("Shipping order: {}", orderState.orderId.id);
           OrderShippedEvent event = order.ship(trackingNumber);
-          return new EventBatch(orderId.id, orderState.version, ImmutableList.of(event));
+          return new EventBatch(orderState.orderId, orderState.version, ImmutableList.of(event));
         });
 
     saveEventsAndResume(eventBatch, asyncResponse, this::isHttpConflict);
@@ -101,13 +101,13 @@ public class OrderCommandResource {
   @Path("cancel-order")
   public void cancelOrder(@Valid @NotNull CancelOrderRequest request, @Suspended AsyncResponse asyncResponse) {
     OrderId orderId = new OrderId(request.orderId);
-    Observable<EventBatch> eventBatch = eventStoreService.loadOrder(orderId.toString())
+    Observable<EventBatch> eventBatch = eventStoreService.loadOrder(orderId.id)
         .map(aggregate -> loadFromEvents(orderId, aggregate.aggregateVersion, aggregate.events))
         .map(orderState -> {
-          Order order = new Order(orderState.customerId, orderState.orderStatus, orderState.orderAmount);
-          logger.info("Cancelling order: {}", orderId);
+          Order order = new Order(orderState.orderId, orderState.customerId, orderState.orderStatus, orderState.orderAmount);
+          logger.info("Cancelling order: {}", orderState.orderId.id);
           OrderCancelledEvent event = order.cancel(request.reason);
-          return new EventBatch(orderId.id, orderState.version, ImmutableList.of(event));
+          return new EventBatch(orderState.orderId, orderState.version, ImmutableList.of(event));
         });
     saveEventsAndResume(eventBatch, asyncResponse, this::isHttpConflict);
   }
