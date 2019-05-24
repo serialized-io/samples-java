@@ -31,12 +31,13 @@ public class AppConfig {
   @Bean
   public AggregateClient<GameState> gameClient() {
     return AggregateClient.aggregateClient(GAME_AGGREGATE_TYPE, GameState.class, getConfig())
-        .registerHandler(GameStarted.class, GameState::gameStarted)
-        .registerHandler(GameFinished.class, GameState::gameFinished)
-        .registerHandler(PlayerAnswered.class, GameState::playerAnswered)
-        .registerHandler(RoundStarted.class, GameState::roundStarted)
-        .registerHandler(RoundFinished.class, GameState::roundFinished)
-        .registerHandler(RoundTied.class, GameState::roundTied)
+        .registerHandler(GameStarted.class, GameState::handleGameStarted)
+        .registerHandler(PlayerWonRound.class, GameState::handlePlayerWonRound)
+        .registerHandler(GameFinished.class, GameState::handleGameFinished)
+        .registerHandler(PlayerAnswered.class, GameState::handlePlayerAnswered)
+        .registerHandler(RoundStarted.class, GameState::handleRoundStarted)
+        .registerHandler(RoundFinished.class, GameState::handleRoundFinished)
+        .registerHandler(RoundTied.class, GameState::handleRoundTied)
         .build();
   }
 

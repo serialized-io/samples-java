@@ -3,17 +3,18 @@ package io.serialized.samples.rockpaperscissors.domain.event;
 import io.serialized.client.aggregate.Event;
 import io.serialized.samples.rockpaperscissors.domain.Player;
 
+import java.util.Set;
+
 import static io.serialized.client.aggregate.Event.newEvent;
+import static java.util.stream.Collectors.toSet;
 
 public class GameStarted {
 
-  public String player1;
-  public String player2;
+  public Set<String> players;
 
-  public static Event<GameStarted> gameStarted(Player player1, Player player2) {
+  public static Event<GameStarted> gameStarted(Set<Player> players) {
     GameStarted gameStarted = new GameStarted();
-    gameStarted.player1 = player1.playerName;
-    gameStarted.player2 = player2.playerName;
+    gameStarted.players = players.stream().map(player -> player.playerName).collect(toSet());
     return newEvent(gameStarted).build();
   }
 
