@@ -16,6 +16,7 @@
     <module>event-sourcing</module>
     <module>order-domain</module>
     <module>order-service</module>
+    <module>spark-todo-service</module>
     <module>spring-boot-rock-paper-scissors</module>
   </modules>
 
