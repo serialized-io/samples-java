@@ -1,7 +1,6 @@
 package io.serialized.samples.rockpaperscissors.domain;
 
 import io.serialized.client.aggregate.Event;
-import io.serialized.client.aggregate.State;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -34,10 +33,9 @@ public class Game {
     this.gameState = gameState;
   }
 
-  public static Game fromState(State<GameState> state) {
-    return new Game(state.data());
+  public static Game fromState(GameState state) {
+    return new Game(state);
   }
-
 
   public List<Event> startGame(Player player1, Player player2) {
     if (player1.equals(player2)) {

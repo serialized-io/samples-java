@@ -1,7 +1,6 @@
 package io.serialized.samples.rockpaperscissors.domain;
 
 import io.serialized.client.aggregate.Event;
-import io.serialized.client.aggregate.State;
 import io.serialized.samples.rockpaperscissors.domain.event.*;
 
 import java.util.*;
@@ -18,8 +17,8 @@ public class GameState {
   private Set<PlayerHand> shownHands = new HashSet<>();
   private Map<Player, Long> wins = new HashMap<>();
 
-  public static State<GameState> newGame() {
-    return new State<>(0, new GameState());
+  public static GameState newGame() {
+    return new GameState();
   }
 
   public void assertAllowsMoreAnswers() {
