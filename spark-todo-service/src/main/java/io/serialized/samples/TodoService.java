@@ -4,7 +4,6 @@ import io.serialized.client.SerializedClientConfig;
 import io.serialized.client.aggregate.AggregateClient;
 import io.serialized.client.aggregate.Event;
 import io.serialized.client.projection.ProjectionClient;
-import io.serialized.client.projection.RawData;
 import io.serialized.client.projection.query.ListProjectionQuery;
 import io.serialized.client.projection.query.SingleProjectionQuery;
 import io.serialized.samples.api.CompleteTodoRequest;
@@ -23,8 +22,10 @@ import java.util.Optional;
 
 import static io.serialized.client.aggregate.AggregateClient.aggregateClient;
 import static io.serialized.client.projection.EventSelector.eventSelector;
-import static io.serialized.client.projection.Function.*;
+import static io.serialized.client.projection.Function.prepend;
+import static io.serialized.client.projection.Function.set;
 import static io.serialized.client.projection.ProjectionDefinition.singleProjection;
+import static io.serialized.client.projection.RawData.rawData;
 import static io.serialized.client.projection.TargetFilter.targetFilter;
 import static io.serialized.client.projection.TargetSelector.targetSelector;
 import static io.serialized.samples.JsonConverter.fromJson;
@@ -55,22 +56,39 @@ public class TodoService {
     projectionClient.createOrUpdate(
         singleProjection(LISTS_PROJECTION)
             .feed(LIST_TYPE)
-            .addHandler("TodoListCreated", set()
-                .with(targetSelector("name"))
-                .with(eventSelector("name"))
-                .build())
-            .addHandler("TodoAdded", prepend()
-                .with(targetSelector("todos"))
-                .build())
-            .addHandler("TodoCompleted", merge()
-                .with(targetSelector("todos[?]"))
-                .with(targetFilter("[?(@.todoId == $.event.todoId)]"))
-                .with(RawData.fromString("{\"status\" : \"COMPLETED\"}"))
-                .build())
-            .addHandler("TodoListCompleted", set()
-                .with(targetSelector("status"))
-                .with(RawData.fromString("COMPLETED"))
-                .build())
+            .addHandler("TodoListCreated",
+                set()
+                    .with(targetSelector("name"))
+                    .with(eventSelector("name"))
+                    .build(),
+                set()
+                    .with(targetSelector("status"))
+                    .with(rawData("EMPTY"))
+                    .build()
+            )
+            .addHandler("TodoAdded",
+                prepend()
+                    .with(targetSelector("todos"))
+                    .build(),
+                set()
+                    .with(targetSelector("todos[?].status"))
+                    .with(targetFilter("[?(@.todoId == $.event.todoId)]"))
+                    .with(rawData("IN_PROGRESS")).build(),
+                set()
+                    .with(targetSelector("status"))
+                    .with(rawData("IN_PROGRESS"))
+                    .build()
+            )
+            .addHandler("TodoCompleted",
+                set()
+                    .with(targetSelector("todos[?].status"))
+                    .with(targetFilter("[?(@.todoId == $.event.todoId)]"))
+                    .with(rawData("COMPLETED")).build())
+            .addHandler("TodoListCompleted",
+                set()
+                    .with(targetSelector("status"))
+                    .with(rawData("COMPLETED"))
+                    .build())
             .build());
   }
 
