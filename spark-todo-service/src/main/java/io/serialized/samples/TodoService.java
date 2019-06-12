@@ -22,11 +22,11 @@ import java.util.Map;
 import java.util.Optional;
 
 import static io.serialized.client.aggregate.AggregateClient.aggregateClient;
-import static io.serialized.client.projection.Filter.filter;
+import static io.serialized.client.projection.EventSelector.eventSelector;
 import static io.serialized.client.projection.Function.*;
 import static io.serialized.client.projection.ProjectionDefinition.singleProjection;
-import static io.serialized.client.projection.Selector.eventSelector;
-import static io.serialized.client.projection.Selector.targetSelector;
+import static io.serialized.client.projection.TargetFilter.targetFilter;
+import static io.serialized.client.projection.TargetSelector.targetSelector;
 import static io.serialized.samples.JsonConverter.fromJson;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static spark.Spark.*;
@@ -55,18 +55,22 @@ public class TodoService {
     projectionClient.createOrUpdate(
         singleProjection(LISTS_PROJECTION)
             .feed(LIST_TYPE)
-            .addHandler("TodoListCreated",
-                set(targetSelector("name"),
-                    eventSelector("name")))
-            .addHandler("TodoAdded",
-                prepend(targetSelector("todos")))
-            .addHandler("TodoCompleted",
-                merge(targetSelector("todos[?]"),
-                    filter("[?(@.todoId == $.event.todoId)]"),
-                    RawData.fromString("{\"status\" : \"COMPLETED\"}")))
-            .addHandler("TodoListCompleted",
-                set(targetSelector("status"),
-                    RawData.fromString("COMPLETED")))
+            .addHandler("TodoListCreated", set()
+                .with(targetSelector("name"))
+                .with(eventSelector("name"))
+                .build())
+            .addHandler("TodoAdded", prepend()
+                .with(targetSelector("todos"))
+                .build())
+            .addHandler("TodoCompleted", merge()
+                .with(targetSelector("todos[?]"))
+                .with(targetFilter("[?(@.todoId == $.event.todoId)]"))
+                .with(RawData.fromString("{\"status\" : \"COMPLETED\"}"))
+                .build())
+            .addHandler("TodoListCompleted", set()
+                .with(targetSelector("status"))
+                .with(RawData.fromString("COMPLETED"))
+                .build())
             .build());
   }
 
