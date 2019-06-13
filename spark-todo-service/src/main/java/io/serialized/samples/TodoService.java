@@ -15,6 +15,8 @@ import io.serialized.samples.domain.event.TodoAdded;
 import io.serialized.samples.domain.event.TodoCompleted;
 import io.serialized.samples.domain.event.TodoListCompleted;
 import io.serialized.samples.domain.event.TodoListCreated;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.QueryParamsMap;
 
 import java.util.List;
@@ -37,6 +39,7 @@ public class TodoService {
   private static final String LIST_TYPE = "list";
   private static final String LISTS_PROJECTION = "lists";
 
+  private static final Logger logger = LoggerFactory.getLogger(TodoService.class);
   private static final AggregateClient<TodoListState> listClient;
   private static final ProjectionClient projectionClient;
 
@@ -118,6 +121,7 @@ public class TodoService {
       // Execute domain logic
       List<Event> events = todoList.createNew(req.listId, req.name);
       // Store event in Serialized
+      logger.info("Creating list: {}", req.listId);
       listClient.save(req.listId, events);
 
       return "";
@@ -131,6 +135,7 @@ public class TodoService {
         // Init domain object with current state
         TodoList todoList = new TodoList(state);
         // Execute domain logic
+        logger.info("Creating todo: {}", req.todoId);
         return todoList.addTodo(req.todoId, req.todoText);
       });
 
@@ -145,6 +150,7 @@ public class TodoService {
         // Init domain object with current state
         TodoList todoList = new TodoList(state);
         // Execute domain logic
+        logger.info("Completing todo: {}", req.todoId);
         return todoList.completeTodo(req.todoId);
       });
 
@@ -154,20 +160,26 @@ public class TodoService {
     get("/queries/lists", (request, response) -> {
       ListProjectionQuery.Builder builder = new ListProjectionQuery.Builder("lists");
       QueryParamsMap queryParamsMap = request.queryMap("status");
+      // Fetch projected lists from Serialized
       if (queryParamsMap.hasValue()) {
-        return projectionClient.list(builder.reference(queryParamsMap.value()).build(Map.class));
+        String status = queryParamsMap.value();
+        logger.info("Returning all lists with status: {}", status);
+        return projectionClient.list(builder.reference(status).build(Map.class));
       } else {
+        logger.info("Returning all lists");
         return projectionClient.list(builder.build(Map.class));
       }
     }, new JsonConverter());
 
     get("/queries/lists/:listId", (request, response) -> {
       String listId = request.params(":listId");
-      SingleProjectionQuery query = new SingleProjectionQuery.Builder("lists").id(listId).build(Map.class);
-      return projectionClient.query(query);
+      logger.info("Returning lists with ID: {}", listId);
+      // Fetch the projected to do list from Serialized
+      return projectionClient.query(new SingleProjectionQuery.Builder("lists").id(listId).build(Map.class));
     }, new JsonConverter());
 
     exception(IllegalArgumentException.class, (exception, request, response) -> {
+      logger.warn("Error: " + exception.getMessage(), exception);
       response.status(400);
       response.type("application/json");
       response.body("{\"message\":\"" + exception.getMessage() + "\"}");
