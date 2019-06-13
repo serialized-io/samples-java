@@ -4,10 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <prerequisites>
-    <maven>3.0.0</maven>
-  </prerequisites>
-
   <parent>
     <groupId>io.serialized.samples</groupId>
     <artifactId>samples-java</artifactId>
@@ -32,7 +28,6 @@
     <hibernate-validation.version>5.4.3.Final</hibernate-validation.version>
     <retrofit.version>2.5.0</retrofit.version>
     <rxjava.version>2.2.2</rxjava.version>
-    <maven.enforcer.version>1.4.1</maven.enforcer.version>
     <mainClass>io.serialized.samples.orderservice.OrderApplication</mainClass>
   </properties>
 
