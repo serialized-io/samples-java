@@ -48,7 +48,6 @@
     <dependency>
       <groupId>io.serialized</groupId>
       <artifactId>serialized-client</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <build>

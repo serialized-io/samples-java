@@ -1,0 +1,58 @@
+package io.serialized.samples.encryption;
+
+import io.serialized.client.SerializedClientConfig;
+import io.serialized.client.feed.Event;
+import io.serialized.client.feed.FeedClient;
+import io.serialized.samples.encryption.crypto.EncryptionService;
+import io.serialized.samples.encryption.crypto.impl.AesEncryptionService;
+import io.serialized.samples.encryption.crypto.impl.DummyCryptoKeyRepository;
+
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static org.apache.commons.lang3.StringUtils.defaultString;
+
+public class DecryptionTest {
+
+  public static void main(String[] args) {
+    String accessKey = getConfig("SERIALIZED_ACCESS_KEY");
+    String secretAccessKey = getConfig("SERIALIZED_SECRET_ACCESS_KEY");
+
+    SerializedClientConfig config = SerializedClientConfig.serializedConfig()
+        .accessKey(accessKey)
+        .secretAccessKey(secretAccessKey)
+        .build();
+
+    System.out.format("Connecting using [%s]\n", accessKey);
+
+    EncryptionService encryptionService = new AesEncryptionService();
+    DummyCryptoKeyRepository cryptoKeyRepository = new DummyCryptoKeyRepository();
+
+    FeedClient feedClient = FeedClient.feedClient(config).build();
+    FeedClient.FeedRequest feed = feedClient.feed("customer");
+
+    final AtomicLong lastConsumedSequenceNumber = new AtomicLong();
+
+    feed.execute(0, feedEntry -> {
+      System.out.printf("Processing entry with sequence number [%s] - ", feedEntry.sequenceNumber());
+
+      for (Event event : feedEntry.events()) {
+        UUID customerId = UUID.fromString(event.dataValueAs("customerId", String.class));
+        byte[] secretKey = cryptoKeyRepository.getSecretKey(customerId);
+        String decryptedSecret = (String) encryptionService.decrypt(secretKey, event.encryptedData());
+        System.out.printf("DecryptedSecret = [%s]\n", decryptedSecret);
+      }
+
+      lastConsumedSequenceNumber.set(feedEntry.sequenceNumber());
+    });
+
+    System.out.println("Done!");
+  }
+
+  private static String getConfig(String key) {
+    return Optional.ofNullable(defaultString(System.getenv(key), System.getProperty(key)))
+        .orElseThrow(() -> new IllegalStateException("Missing environment property: " + key));
+  }
+
+}

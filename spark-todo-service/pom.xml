@@ -14,7 +14,6 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <spark.version>2.9.1</spark.version>
-    <serialized-client.version>1.0.0-SNAPSHOT</serialized-client.version>
   </properties>
 
   <dependencies>
@@ -26,7 +25,6 @@
     <dependency>
       <groupId>io.serialized</groupId>
       <artifactId>serialized-client</artifactId>
-      <version>${serialized-client.version}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
