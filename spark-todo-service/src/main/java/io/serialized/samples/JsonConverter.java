@@ -13,7 +13,7 @@ import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS
 
 public class JsonConverter implements ResponseTransformer {
 
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+  private static final ObjectMapper objectMapper = new ObjectMapper()
       .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
       .configure(WRITE_DATES_AS_TIMESTAMPS, false)
       .configure(INDENT_OUTPUT, true)
@@ -25,7 +25,7 @@ public class JsonConverter implements ResponseTransformer {
       return "";
     } else {
       try {
-        return OBJECT_MAPPER.writeValueAsString(model);
+        return objectMapper.writeValueAsString(model);
       } catch (JsonProcessingException e) {
         throw new RuntimeException(e);
       }
@@ -34,7 +34,7 @@ public class JsonConverter implements ResponseTransformer {
 
   public static <T> T fromJson(String body, Class<T> clazz) {
     try {
-      return OBJECT_MAPPER.readValue(body, clazz);
+      return objectMapper.readValue(body, clazz);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
