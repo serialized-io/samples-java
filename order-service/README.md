@@ -1,4 +1,4 @@
-# CQRS/EventSourcing sample application
+# Order Service - CQRS/EventSourcing sample application
 
 Sample application demonstrating the Serialized APIs using [Dropwizard](https://www.dropwizard.io) and
 [RxJava](https://github.com/ReactiveX/RxJava).
