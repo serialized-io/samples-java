@@ -15,6 +15,7 @@ import io.serialized.samples.domain.event.TodoAdded;
 import io.serialized.samples.domain.event.TodoCompleted;
 import io.serialized.samples.domain.event.TodoListCompleted;
 import io.serialized.samples.domain.event.TodoListCreated;
+import spark.QueryParamsMap;
 
 import java.util.List;
 import java.util.Map;
@@ -22,8 +23,7 @@ import java.util.Optional;
 
 import static io.serialized.client.aggregate.AggregateClient.aggregateClient;
 import static io.serialized.client.projection.EventSelector.eventSelector;
-import static io.serialized.client.projection.Function.prepend;
-import static io.serialized.client.projection.Function.set;
+import static io.serialized.client.projection.Function.*;
 import static io.serialized.client.projection.ProjectionDefinition.singleProjection;
 import static io.serialized.client.projection.RawData.rawData;
 import static io.serialized.client.projection.TargetFilter.targetFilter;
@@ -43,6 +43,7 @@ public class TodoService {
   static {
     SerializedClientConfig serializedClientConfig = getConfig();
 
+    // Register mapping between event types and handler methods
     listClient = aggregateClient(LIST_TYPE, TodoListState.class, serializedClientConfig)
         .registerHandler(TodoListCreated.class, TodoListState::handleTodoListCreated)
         .registerHandler(TodoAdded.class, TodoListState::handleTodoAdded)
@@ -52,7 +53,7 @@ public class TodoService {
 
     projectionClient = ProjectionClient.projectionClient(serializedClientConfig).build();
 
-    // Make sure projection is configured in Serialized
+    // Make sure the projection is configured in Serialized
     projectionClient.createOrUpdate(
         singleProjection(LISTS_PROJECTION)
             .feed(LIST_TYPE)
@@ -64,6 +65,9 @@ public class TodoService {
                 set()
                     .with(targetSelector("status"))
                     .with(rawData("EMPTY"))
+                    .build(),
+                setref()
+                    .with(targetSelector("status"))
                     .build()
             )
             .addHandler("TodoAdded",
@@ -77,29 +81,32 @@ public class TodoService {
                 set()
                     .with(targetSelector("status"))
                     .with(rawData("IN_PROGRESS"))
+                    .build(),
+                setref()
+                    .with(targetSelector("status"))
                     .build()
             )
             .addHandler("TodoCompleted",
                 set()
                     .with(targetSelector("todos[?].status"))
                     .with(targetFilter("[?(@.todoId == $.event.todoId)]"))
-                    .with(rawData("COMPLETED")).build())
+                    .with(rawData("COMPLETED")).build(),
+                setref()
+                    .with(targetSelector("status"))
+                    .build())
             .addHandler("TodoListCompleted",
                 set()
                     .with(targetSelector("status"))
                     .with(rawData("COMPLETED"))
-                    .build())
-            .build());
+                    .build(),
+                setref()
+                    .with(targetSelector("status"))
+                    .build()
+            ).build());
   }
 
   public static void main(String[] args) {
     port(8080);
-
-    exception(IllegalArgumentException.class, (exception, request, response) -> {
-      response.status(400);
-      response.type("application/json");
-      response.body("{\"message\":\"" + exception.getMessage() + "\"}");
-    });
 
     before((request, response) -> response.type("application/json"));
 
@@ -145,8 +152,13 @@ public class TodoService {
     });
 
     get("/queries/lists", (request, response) -> {
-      ListProjectionQuery query = new ListProjectionQuery.Builder("lists").build(Map.class);
-      return projectionClient.list(query);
+      ListProjectionQuery.Builder builder = new ListProjectionQuery.Builder("lists");
+      QueryParamsMap queryParamsMap = request.queryMap("status");
+      if (queryParamsMap.hasValue()) {
+        return projectionClient.list(builder.reference(queryParamsMap.value()).build(Map.class));
+      } else {
+        return projectionClient.list(builder.build(Map.class));
+      }
     }, new JsonConverter());
 
     get("/queries/lists/:listId", (request, response) -> {
@@ -154,6 +166,12 @@ public class TodoService {
       SingleProjectionQuery query = new SingleProjectionQuery.Builder("lists").id(listId).build(Map.class);
       return projectionClient.query(query);
     }, new JsonConverter());
+
+    exception(IllegalArgumentException.class, (exception, request, response) -> {
+      response.status(400);
+      response.type("application/json");
+      response.body("{\"message\":\"" + exception.getMessage() + "\"}");
+    });
 
   }
 
