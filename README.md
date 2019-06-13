@@ -1,10 +1,10 @@
 # Java samples for Serialized
 
+Sample code showing how to work with the Serialized API:s. 
 
-## Request API-keys
+## Get your free API-keys
 
-[Sign up](https://serialized.io/) to get your free API-keys to [Serialized](https://serialized.io).
-
+[Sign up](https://serialized.io/) and login to get your free API-keys to [Serialized](https://serialized.io).
 
 ## Clone and build
 
