@@ -1,6 +1,5 @@
 package io.serialized.samples.aggregate.order;
 
-import io.serialized.samples.infrastructure.OrderService;
 import io.serialized.samples.order.domain.*;
 import io.serialized.samples.order.domain.event.OrderCancelledEvent;
 import io.serialized.samples.order.domain.event.OrderEvent;

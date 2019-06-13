@@ -1,4 +1,4 @@
-package io.serialized.samples.infrastructure;
+package io.serialized.samples.aggregate.order;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
