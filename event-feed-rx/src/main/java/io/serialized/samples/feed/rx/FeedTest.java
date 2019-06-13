@@ -21,7 +21,7 @@ public class FeedTest {
 
     OrderFeedEntryHandler entryHandler = new OrderFeedEntryHandler();
     EventFeedRxClient feedClient = new EventFeedRxClient(FEED_API_URI, "order", entryHandler, accessKey, secretAccessKey);
-    System.out.println("Waiting for events...");
+    System.out.println("Waiting for 'order' events...");
     Executors.newSingleThreadExecutor().submit(feedClient);
   }
 

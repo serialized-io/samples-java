@@ -24,7 +24,7 @@ public class FeedTest {
     OrderFeedEntryHandler entryHandler = new OrderFeedEntryHandler();
     EventFeedClient feedClient = new EventFeedClient(ORDER_FEED_API_URI, entryHandler, accessKey, secretAccessKey);
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    System.out.println("Waiting for events...");
+    System.out.println("Waiting for 'order' events...");
     executor.scheduleWithFixedDelay(feedClient, 2, 2, TimeUnit.SECONDS);
   }
 
