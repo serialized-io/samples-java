@@ -1,12 +1,12 @@
 # Serialized Event Projector Lambda
 
 This example describes how to create and deploy an AWS Lambda function acting as a
-[Serialized](https://serialized.io) [projector](https://serialized.io/docs/getting-started/projections/).
+[Serialized](https://serialized.io) [projector](https://docs.serialized.io/api-reference/basics/getting-started/projections).
 
 The function will automatically be called by the Serialized Event Engine whenever you store a new event.
 The function call will contain the event data, metadata and the current projection state (if any).
 The function will return a result that will be stored by Serialized as a
-[projection](https://serialized.io/docs/apis/event-projection/).    
+[projection](https://docs.serialized.io/api-reference/apis/projections).    
 
 In this example we will create a function that keeps track of how many times each user has logged in. 
 We assume we have an aggregate called `user` and that an event called `UserLoggedInEvent` is emitted every time
@@ -175,7 +175,7 @@ $ curl -i https://api.serialized.io/projections/definitions \
   '
 ``` 
 
-The full documentation can be found [here](https://serialized.io/docs/apis/event-projection/).
+The full documentation can be found [here](https://docs.serialized.io/api-reference/apis/projections/event-handlers).
 
 This example is based on 
 [Jersey Quick-start guide](https://github.com/awslabs/aws-serverless-java-container/wiki/Quick-start---Jersey).
