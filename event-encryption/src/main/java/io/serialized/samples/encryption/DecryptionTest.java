@@ -3,6 +3,7 @@ package io.serialized.samples.encryption;
 import io.serialized.client.SerializedClientConfig;
 import io.serialized.client.feed.Event;
 import io.serialized.client.feed.FeedClient;
+import io.serialized.samples.encryption.crypto.CryptoKeyRepository;
 import io.serialized.samples.encryption.crypto.EncryptionService;
 import io.serialized.samples.encryption.crypto.impl.AesEncryptionService;
 import io.serialized.samples.encryption.crypto.impl.DummyCryptoKeyRepository;
@@ -27,7 +28,7 @@ public class DecryptionTest {
     System.out.format("Connecting using [%s]\n", accessKey);
 
     EncryptionService encryptionService = new AesEncryptionService();
-    DummyCryptoKeyRepository cryptoKeyRepository = new DummyCryptoKeyRepository();
+    CryptoKeyRepository cryptoKeyRepository = new DummyCryptoKeyRepository();
 
     FeedClient feedClient = FeedClient.feedClient(config).build();
     FeedClient.FeedRequest feed = feedClient.feed("customer");

@@ -3,6 +3,7 @@ package io.serialized.samples.encryption;
 import io.serialized.client.SerializedClientConfig;
 import io.serialized.client.aggregate.AggregateClient;
 import io.serialized.client.aggregate.Event;
+import io.serialized.samples.encryption.crypto.CryptoKeyRepository;
 import io.serialized.samples.encryption.crypto.EncryptionService;
 import io.serialized.samples.encryption.crypto.impl.AesEncryptionService;
 import io.serialized.samples.encryption.crypto.impl.DummyCryptoKeyRepository;
@@ -28,7 +29,7 @@ public class EncryptionTest {
     System.out.format("Connecting using [%s]\n", accessKey);
 
     EncryptionService encryptionService = new AesEncryptionService();
-    DummyCryptoKeyRepository cryptoKeyRepository = new DummyCryptoKeyRepository();
+    CryptoKeyRepository cryptoKeyRepository = new DummyCryptoKeyRepository();
 
     AggregateClient<Object> aggregateClient = AggregateClient.aggregateClient("customer", Object.class, config).build();
 
