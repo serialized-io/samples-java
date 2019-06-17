@@ -6,9 +6,9 @@ import io.serialized.client.aggregate.Event;
 import io.serialized.client.projection.ProjectionClient;
 import io.serialized.client.projection.query.ListProjectionQuery;
 import io.serialized.client.projection.query.SingleProjectionQuery;
-import io.serialized.samples.api.CompleteTodoRequest;
-import io.serialized.samples.api.CreateTodoListRequest;
-import io.serialized.samples.api.CreateTodoRequest;
+import io.serialized.samples.api.CompleteTodoCommand;
+import io.serialized.samples.api.CreateTodoCommand;
+import io.serialized.samples.api.CreateTodoListCommand;
 import io.serialized.samples.domain.TodoList;
 import io.serialized.samples.domain.TodoListState;
 import io.serialized.samples.domain.event.TodoAdded;
@@ -115,28 +115,28 @@ public class TodoService {
 
     post("/commands/create-list", (request, response) -> {
       // Convert incoming JSON payload to request class
-      CreateTodoListRequest req = fromJson(request.body(), CreateTodoListRequest.class);
+      CreateTodoListCommand command = fromJson(request.body(), CreateTodoListCommand.class);
       // Construct initial state of the domain object
       TodoList todoList = new TodoList(new TodoListState());
       // Execute domain logic
-      List<Event> events = todoList.createNew(req.listId, req.name);
+      List<Event> events = todoList.createNew(command.listId, command.name);
       // Store event in Serialized
-      logger.info("Creating list: {}", req.listId);
-      listClient.save(req.listId, events);
+      logger.info("Creating list: {}", command.listId);
+      listClient.save(command.listId, events);
 
       return "";
     });
 
     post("/commands/create-todo", (request, response) -> {
       // Convert incoming JSON payload to request class
-      CreateTodoRequest req = fromJson(request.body(), CreateTodoRequest.class);
+      CreateTodoCommand command = fromJson(request.body(), CreateTodoCommand.class);
       // Load current state, update aggregate and save
-      listClient.update(req.listId, state -> {
+      listClient.update(command.listId, state -> {
         // Init domain object with current state
         TodoList todoList = new TodoList(state);
         // Execute domain logic
-        logger.info("Creating todo: {}", req.todoId);
-        return todoList.addTodo(req.todoId, req.todoText);
+        logger.info("Creating todo: {}", command.todoId);
+        return todoList.addTodo(command.todoId, command.todoText);
       });
 
       return "";
@@ -144,14 +144,14 @@ public class TodoService {
 
     post("/commands/complete-todo", (request, response) -> {
       // Convert incoming JSON payload to request class
-      CompleteTodoRequest req = fromJson(request.body(), CompleteTodoRequest.class);
+      CompleteTodoCommand command = fromJson(request.body(), CompleteTodoCommand.class);
       // Load current state, update aggregate and save
-      listClient.update(req.listId, state -> {
+      listClient.update(command.listId, state -> {
         // Init domain object with current state
         TodoList todoList = new TodoList(state);
         // Execute domain logic
-        logger.info("Completing todo: {}", req.todoId);
-        return todoList.completeTodo(req.todoId);
+        logger.info("Completing todo: {}", command.todoId);
+        return todoList.completeTodo(command.todoId);
       });
 
       return "";

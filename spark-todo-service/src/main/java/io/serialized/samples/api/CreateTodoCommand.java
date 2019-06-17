@@ -2,7 +2,7 @@ package io.serialized.samples.api;
 
 import java.util.UUID;
 
-public class CreateTodoRequest {
+public class CreateTodoCommand {
 
   public UUID listId;
   public UUID todoId;
