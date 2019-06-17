@@ -23,6 +23,7 @@ public class GameApplication implements CommandLineRunner {
   @Override
   public void run(String... strings) {
     configurer.createHighScoreProjection();
+    configurer.createGameProjection();
     configurer.totalStatsProjection();
   }
 

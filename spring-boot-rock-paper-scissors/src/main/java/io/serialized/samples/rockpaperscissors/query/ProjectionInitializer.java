@@ -8,6 +8,7 @@ import static io.serialized.client.projection.EventSelector.eventSelector;
 import static io.serialized.client.projection.Function.*;
 import static io.serialized.client.projection.ProjectionDefinition.aggregatedProjection;
 import static io.serialized.client.projection.ProjectionDefinition.singleProjection;
+import static io.serialized.client.projection.RawData.rawData;
 import static io.serialized.client.projection.TargetSelector.targetSelector;
 
 @Service
@@ -29,6 +30,19 @@ public class ProjectionInitializer {
                 inc().with(targetSelector("wins")).build(),
                 set().with(targetSelector("playerName")).with(eventSelector("winner")).build(),
                 setref().with(targetSelector("wins")).build())
+            .build());
+  }
+
+  public void createGameProjection() {
+    projectionClient.createOrUpdate(
+        singleProjection("games")
+            .feed("game")
+            .addHandler("GameStarted",
+                merge().build(),
+                set().with(targetSelector("status")).with(rawData("IN_PROGRESS")).build())
+            .addHandler("GameFinished",
+                merge().build(),
+                set().with(targetSelector("status")).with(rawData("FINISHED")).build())
             .build());
   }
 
