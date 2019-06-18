@@ -5,6 +5,7 @@ import io.serialized.client.aggregate.AggregateClient;
 import io.serialized.client.aggregate.Event;
 import io.serialized.client.projection.ProjectionClient;
 import io.serialized.client.projection.query.ListProjectionQuery;
+import io.serialized.client.projection.query.ProjectionQueries;
 import io.serialized.client.projection.query.SingleProjectionQuery;
 import io.serialized.samples.api.CompleteTodoCommand;
 import io.serialized.samples.api.CreateTodoCommand;
@@ -158,16 +159,16 @@ public class TodoService {
     });
 
     get("/queries/lists", (request, response) -> {
-      ListProjectionQuery.Builder builder = new ListProjectionQuery.Builder("lists");
+      ListProjectionQuery.Builder builder = ProjectionQueries.list("lists");
       QueryParamsMap queryParamsMap = request.queryMap("status");
       // Fetch projected lists from Serialized
       if (queryParamsMap.hasValue()) {
         String status = queryParamsMap.value();
         logger.info("Returning all lists with status: {}", status);
-        return projectionClient.list(builder.reference(status).build(Map.class));
+        return projectionClient.query(builder.reference(status).build(Map.class));
       } else {
         logger.info("Returning all lists");
-        return projectionClient.list(builder.build(Map.class));
+        return projectionClient.query(builder.build(Map.class));
       }
     }, new JsonConverter());
 
