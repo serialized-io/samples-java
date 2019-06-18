@@ -6,7 +6,6 @@ import io.serialized.client.aggregate.Event;
 import io.serialized.client.projection.ProjectionClient;
 import io.serialized.client.projection.query.ListProjectionQuery;
 import io.serialized.client.projection.query.ProjectionQueries;
-import io.serialized.client.projection.query.SingleProjectionQuery;
 import io.serialized.samples.api.CompleteTodoCommand;
 import io.serialized.samples.api.CreateTodoCommand;
 import io.serialized.samples.api.CreateTodoListCommand;
@@ -25,7 +24,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static io.serialized.client.aggregate.AggregateClient.aggregateClient;
-import static io.serialized.client.projection.EventSelector.eventSelector;
 import static io.serialized.client.projection.Function.*;
 import static io.serialized.client.projection.ProjectionDefinition.singleProjection;
 import static io.serialized.client.projection.RawData.rawData;
@@ -62,10 +60,7 @@ public class TodoService {
         singleProjection(LISTS_PROJECTION)
             .feed(LIST_TYPE)
             .addHandler("TodoListCreated",
-                set()
-                    .with(targetSelector("name"))
-                    .with(eventSelector("name"))
-                    .build(),
+                merge().build(),
                 set()
                     .with(targetSelector("status"))
                     .with(rawData("EMPTY"))
@@ -176,7 +171,7 @@ public class TodoService {
       String listId = request.params(":listId");
       logger.info("Returning lists with ID: {}", listId);
       // Fetch the projected to do list from Serialized
-      return projectionClient.query(new SingleProjectionQuery.Builder("lists").id(listId).build(Map.class));
+      return projectionClient.query(ProjectionQueries.single("lists").id(listId).build(Map.class));
     }, new JsonConverter());
 
     exception(IllegalArgumentException.class, (exception, request, response) -> {
