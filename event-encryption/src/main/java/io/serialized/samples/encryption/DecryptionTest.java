@@ -10,7 +10,6 @@ import io.serialized.samples.encryption.crypto.impl.DummyCryptoKeyRepository;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static org.apache.commons.lang3.StringUtils.defaultString;
 
@@ -33,8 +32,6 @@ public class DecryptionTest {
     FeedClient feedClient = FeedClient.feedClient(config).build();
     FeedClient.FeedRequest feed = feedClient.feed("customer");
 
-    final AtomicLong lastConsumedSequenceNumber = new AtomicLong();
-
     feed.execute(0, feedEntry -> {
       System.out.printf("Processing entry with sequence number [%s] - ", feedEntry.sequenceNumber());
 
@@ -45,7 +42,6 @@ public class DecryptionTest {
         System.out.printf("DecryptedSecret = [%s]\n", decryptedSecret);
       }
 
-      lastConsumedSequenceNumber.set(feedEntry.sequenceNumber());
     });
 
     System.out.println("Done!");
