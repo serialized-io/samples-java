@@ -13,7 +13,7 @@ public class Feed {
     public long sequenceNumber;
     public String aggregateId;
     public long timestamp;
-    public String type;
+    public String feedName;
     public List<FeedEntry.Event> events;
 
     public static class Event {
