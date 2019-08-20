@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static io.serialized.client.aggregate.AggregateClient.aggregateClient;
+import static io.serialized.client.aggregate.AggregateRequest.saveRequest;
 import static io.serialized.client.projection.Function.*;
 import static io.serialized.client.projection.ProjectionDefinition.singleProjection;
 import static io.serialized.client.projection.RawData.rawData;
@@ -118,7 +119,7 @@ public class TodoService {
       List<Event> events = todoList.createNew(command.listId, command.name);
       // Store event in Serialized
       logger.info("Creating list: {}", command.listId);
-      listClient.save(command.listId, events);
+      listClient.save(saveRequest().withAggregateId(command.listId).withEvents(events).build());
 
       return "";
     });

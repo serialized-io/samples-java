@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import static io.serialized.client.aggregate.AggregateRequest.saveRequest;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @Controller
@@ -35,7 +36,7 @@ public class GameCommandController {
     GameState state = GameState.newGame();
 
     Game game = Game.fromState(state);
-    gameClient.save(command.gameId, game.startGame(player1, player2));
+    gameClient.save(saveRequest().withAggregateId(command.gameId).withEvents(game.startGame(player1, player2)).build());
     logger.info("Game [{}] started with players [{}, {}]", command.gameId, command.player1, command.player2);
   }
 
