@@ -59,9 +59,9 @@ public class OrderCommandResource {
       Order order = Order.createNewOrder(orderId, customerId);
       logger.info("Placing order: {}", orderId);
       OrderPlacedEvent event = order.place(orderAmount);
-      return new EventBatch(orderId, ImmutableList.of(event));
+      return new EventBatch(ImmutableList.of(event));
     });
-    saveEventsAndResume(eventBatch, asyncResponse, throwable -> false);
+    saveEventsAndResume(orderId.id, eventBatch, asyncResponse, throwable -> false);
   }
 
   @POST
@@ -75,9 +75,9 @@ public class OrderCommandResource {
           Amount amount = new Amount(request.amount);
           logger.info("Paying [{}] for order: {}", amount, orderState.orderId.id);
           List<OrderEvent> events = order.pay(amount);
-          return new EventBatch(orderState.orderId, orderState.version, events);
+          return new EventBatch(orderState.version, events);
         });
-    saveEventsAndResume(eventBatch, asyncResponse, this::isHttpConflict);
+    saveEventsAndResume(orderId.id, eventBatch, asyncResponse, this::isHttpConflict);
   }
 
   @POST
@@ -91,10 +91,10 @@ public class OrderCommandResource {
           TrackingNumber trackingNumber = new TrackingNumber(request.trackingNumber);
           logger.info("Shipping order: {}", orderState.orderId.id);
           OrderShippedEvent event = order.ship(trackingNumber);
-          return new EventBatch(orderState.orderId, orderState.version, ImmutableList.of(event));
+          return new EventBatch(orderState.version, ImmutableList.of(event));
         });
 
-    saveEventsAndResume(eventBatch, asyncResponse, this::isHttpConflict);
+    saveEventsAndResume(orderId.id, eventBatch, asyncResponse, this::isHttpConflict);
   }
 
   @POST
@@ -107,16 +107,16 @@ public class OrderCommandResource {
           Order order = new Order(orderState.orderId, orderState.customerId, orderState.orderStatus, orderState.orderAmount);
           logger.info("Cancelling order: {}", orderState.orderId.id);
           OrderCancelledEvent event = order.cancel(request.reason);
-          return new EventBatch(orderState.orderId, orderState.version, ImmutableList.of(event));
+          return new EventBatch(orderState.version, ImmutableList.of(event));
         });
-    saveEventsAndResume(eventBatch, asyncResponse, this::isHttpConflict);
+    saveEventsAndResume(orderId.id, eventBatch, asyncResponse, this::isHttpConflict);
   }
 
-  private void saveEventsAndResume(Observable<EventBatch> observable, AsyncResponse asyncResponse, Predicate<Throwable> retry) {
+  private void saveEventsAndResume(String aggregateId, Observable<EventBatch> observable, AsyncResponse asyncResponse, Predicate<Throwable> retry) {
     configureTimeoutHandling(asyncResponse);
     observable
         .filter(eventBatch -> !eventBatch.events.isEmpty()) // No-ops are represented by empty event batch
-        .flatMap(eventStoreService::saveOrderEvents)
+        .flatMap(eventBatch -> eventStoreService.saveOrderEvents(aggregateId, eventBatch))
         .retry(RETRY_TIMES, retry)
         .subscribeOn(Schedulers.io())
         .subscribe(

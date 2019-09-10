@@ -1,21 +1,17 @@
 package io.serialized.samples.orderservice.integration;
 
-import io.serialized.samples.order.domain.Id;
-
 import java.util.List;
 
 public class EventBatch {
 
-  public final String aggregateId;
   public final Integer expectedVersion;
   public final List events;
 
-  public EventBatch(Id aggregateId, List events) {
-    this(aggregateId, 0, events);
+  public EventBatch(List events) {
+    this(0, events);
   }
 
-  public EventBatch(Id aggregateId, Integer expectedVersion, List events) {
-    this.aggregateId = aggregateId.id;
+  public EventBatch(Integer expectedVersion, List events) {
     this.expectedVersion = expectedVersion;
     this.events = events;
   }

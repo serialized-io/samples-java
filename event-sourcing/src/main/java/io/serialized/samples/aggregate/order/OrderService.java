@@ -53,11 +53,11 @@ public class OrderService {
   }
 
   public void saveEvents(OrderId orderId, Integer expectedVersion, List<OrderEvent> events) {
-    doPost(newEventBatch(orderId, expectedVersion, events));
+    doPost(orderId.id, newEventBatch(expectedVersion, events));
   }
 
-  protected Response doPost(EventBatch eventBatch) {
-    Invocation.Builder builder = client.target(eventStoreUri).path(aggregateType).path("events").request();
+  protected Response doPost(String aggregateId, EventBatch eventBatch) {
+    Invocation.Builder builder = client.target(eventStoreUri).path(aggregateType).path(aggregateId).path("events").request();
     return assertSuccessful(addApiKeyHeaders(builder).post(Entity.json(eventBatch)));
   }
 
@@ -81,14 +81,12 @@ public class OrderService {
   }
 
   public static class EventBatch<E> {
-    public String aggregateId;
     public Integer expectedVersion;
     public List<E> events;
   }
 
-  public EventBatch newEventBatch(OrderId orderId, Integer expectedVersion, List<OrderEvent> events) {
+  public EventBatch newEventBatch(Integer expectedVersion, List<OrderEvent> events) {
     EventBatch eventBatch = new EventBatch();
-    eventBatch.aggregateId = orderId.id;
     eventBatch.expectedVersion = expectedVersion;
     eventBatch.events = events;
     return eventBatch;

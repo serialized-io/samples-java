@@ -64,8 +64,8 @@ public class OrderCommandResourceTest {
     }
 
     @POST
-    @Path("events")
-    public Response saveEvents(Map payload) {
+    @Path("{aggregateId}/events")
+    public Response saveEvents(@PathParam("aggregateId") String aggregateId, Map payload) {
       EXPECTED_RESOURCE_INVOCATIONS.countDown();
       EVENT_STORE.saveOrderEvents(payload);
       return Response.ok().build();

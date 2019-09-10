@@ -8,10 +8,10 @@ import retrofit2.http.Path;
 
 public interface EventStoreService {
 
-  @GET("aggregates/order/{id}")
-  Observable<OrderAggregate> loadOrder(@Path("id") String id);
+  @GET("aggregates/order/{aggregateId}")
+  Observable<OrderAggregate> loadOrder(@Path("aggregateId") String id);
 
-  @POST("aggregates/order/events")
-  Observable<Void> saveOrderEvents(@Body EventBatch eventBatch);
+  @POST("aggregates/order/{aggregateId}/events")
+  Observable<Void> saveOrderEvents(@Path("aggregateId") String id, @Body EventBatch eventBatch);
 
 }
