@@ -22,7 +22,7 @@ Open a terminal window and start the service, on port 8080, using the following 
 export SERIALIZED_ACCESS_KEY=<your-access-key>
 export SERIALIZED_SECRET_ACCESS_KEY=<your-secret_access-key>
 cd order-service
-java -jar order-service/target/order-service.jar server config/dev.yml
+java -jar target/order-service.jar server config/dev.yml
 ```
 
 #### Place an order
