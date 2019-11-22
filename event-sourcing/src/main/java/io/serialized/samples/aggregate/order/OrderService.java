@@ -75,7 +75,6 @@ public class OrderService {
   }
 
   public static class OrderAggregate<E> {
-    public String aggregateId;
     public Integer aggregateVersion;
     public List<OrderEvent> events;
   }
