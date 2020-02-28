@@ -3,7 +3,11 @@ package io.serialized.samples.domain;
 import io.serialized.client.aggregate.Event;
 import org.apache.commons.lang3.Validate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import static io.serialized.samples.domain.event.TodoAdded.todoAdded;
 import static io.serialized.samples.domain.event.TodoCompleted.todoCompleted;
@@ -25,12 +29,12 @@ public class TodoList {
     this.todosLeft.addAll(state.todosLeft());
   }
 
-  public List<Event> createNew(UUID listId, String name) {
+  public List<Event<?>> createNew(UUID listId, String name) {
     Validate.notEmpty(trimToEmpty(name), "List must have a name");
     return singletonList(todoListCreated(listId, name));
   }
 
-  public List<Event> addTodo(UUID todoId, String text) {
+  public List<Event<?>> addTodo(UUID todoId, String text) {
     Validate.notEmpty(trimToEmpty(text), "Todo must have a text");
     if (todos.contains(todoId)) {
       return emptyList();
@@ -39,9 +43,9 @@ public class TodoList {
     }
   }
 
-  public List<Event> completeTodo(UUID todoId) {
+  public List<Event<?>> completeTodo(UUID todoId) {
     if (this.todosLeft.contains(todoId)) {
-      List<Event> events = new ArrayList<>();
+      List<Event<?>> events = new ArrayList<>();
       events.add(todoCompleted(todoId));
       if (todosLeft.size() == 1) {
         events.add(todoListCompleted(listId));

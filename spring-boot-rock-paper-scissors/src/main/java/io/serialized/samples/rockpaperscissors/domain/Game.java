@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static io.serialized.samples.rockpaperscissors.domain.Answer.*;
+import static io.serialized.samples.rockpaperscissors.domain.Answer.PAPER;
+import static io.serialized.samples.rockpaperscissors.domain.Answer.ROCK;
+import static io.serialized.samples.rockpaperscissors.domain.Answer.SCISSORS;
 import static io.serialized.samples.rockpaperscissors.domain.event.GameFinished.gameFinished;
 import static io.serialized.samples.rockpaperscissors.domain.event.GameStarted.gameStarted;
 import static io.serialized.samples.rockpaperscissors.domain.event.PlayerAnswered.playerAnswered;
@@ -37,7 +39,7 @@ public class Game {
     return new Game(state);
   }
 
-  public List<Event> startGame(Player player1, Player player2) {
+  public List<Event<?>> startGame(Player player1, Player player2) {
     if (player1.equals(player2)) {
       throw new IllegalArgumentException("Cannot play against yourself");
     }
@@ -45,7 +47,7 @@ public class Game {
     return singletonList(gameStarted(players));
   }
 
-  public List<Event> showHand(Player player, Answer answer) {
+  public List<Event<?>> showHand(Player player, Answer answer) {
 
     if (gameState.handAlreadyShown(new PlayerHand(player, answer))) {
       return emptyList();
@@ -59,7 +61,7 @@ public class Game {
 
     PlayerHand playerHand = new PlayerHand(player, answer);
 
-    List<Event> events = new ArrayList<>();
+    List<Event<?>> events = new ArrayList<>();
     if (gameState.roundHasNotStarted()) {
       events.add(roundStarted(gameState.registeredPlayers()));
     }

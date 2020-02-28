@@ -25,14 +25,21 @@ import java.util.Optional;
 
 import static io.serialized.client.aggregate.AggregateClient.aggregateClient;
 import static io.serialized.client.aggregate.AggregateRequest.saveRequest;
-import static io.serialized.client.projection.Function.*;
+import static io.serialized.client.projection.Function.merge;
+import static io.serialized.client.projection.Function.prepend;
+import static io.serialized.client.projection.Function.set;
+import static io.serialized.client.projection.Function.setref;
 import static io.serialized.client.projection.ProjectionDefinition.singleProjection;
 import static io.serialized.client.projection.RawData.rawData;
 import static io.serialized.client.projection.TargetFilter.targetFilter;
 import static io.serialized.client.projection.TargetSelector.targetSelector;
 import static io.serialized.samples.JsonConverter.fromJson;
 import static org.apache.commons.lang3.StringUtils.defaultString;
-import static spark.Spark.*;
+import static spark.Spark.before;
+import static spark.Spark.exception;
+import static spark.Spark.get;
+import static spark.Spark.port;
+import static spark.Spark.post;
 
 public class TodoService {
 
@@ -116,7 +123,7 @@ public class TodoService {
       // Construct initial state of the domain object
       TodoList todoList = new TodoList(new TodoListState());
       // Execute domain logic
-      List<Event> events = todoList.createNew(command.listId, command.name);
+      List<Event<?>> events = todoList.createNew(command.listId, command.name);
       // Store event in Serialized
       logger.info("Creating list: {}", command.listId);
       listClient.save(saveRequest().withAggregateId(command.listId).withEvents(events).build());

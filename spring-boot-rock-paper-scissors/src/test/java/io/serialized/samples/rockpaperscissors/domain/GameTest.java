@@ -4,7 +4,13 @@ import io.serialized.client.aggregate.AggregateFactory;
 import io.serialized.client.aggregate.Command;
 import io.serialized.client.aggregate.Event;
 import io.serialized.client.aggregate.StateBuilder;
-import io.serialized.samples.rockpaperscissors.domain.event.*;
+import io.serialized.samples.rockpaperscissors.domain.event.GameFinished;
+import io.serialized.samples.rockpaperscissors.domain.event.GameStarted;
+import io.serialized.samples.rockpaperscissors.domain.event.PlayerAnswered;
+import io.serialized.samples.rockpaperscissors.domain.event.PlayerWonRound;
+import io.serialized.samples.rockpaperscissors.domain.event.RoundFinished;
+import io.serialized.samples.rockpaperscissors.domain.event.RoundStarted;
+import io.serialized.samples.rockpaperscissors.domain.event.RoundTied;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -34,7 +40,7 @@ public class GameTest {
 
     Game game = gameFactory.fromCommands(Collections.emptyList());
 
-    List<Event> gameEvents = game.startGame(Player.fromString("Lisa"), Player.fromString("Bob"));
+    List<Event<?>> gameEvents = game.startGame(Player.fromString("Lisa"), Player.fromString("Bob"));
     assertThat(gameEvents.size(), is(1));
 
     Event<GameStarted> gameStarted = firstEventOfType(gameEvents, GameStarted.class);
@@ -50,7 +56,7 @@ public class GameTest {
         // Start game
         startGame(Player.fromString("Lisa"), Player.fromString("Bob")));
 
-    List<Event> gameEvents = game.showHand(Player.fromString("Lisa"), ROCK);
+    List<Event<?>> gameEvents = game.showHand(Player.fromString("Lisa"), ROCK);
     assertThat(gameEvents.size(), is(2));
     Event<RoundStarted> roundStarted = firstEventOfType(gameEvents, RoundStarted.class);
     assertThat(roundStarted.getData().players, hasItem("Lisa"));
@@ -70,7 +76,7 @@ public class GameTest {
         // Round 1
         showHand(Player.fromString("Lisa"), ROCK));
 
-    List<Event> gameEvents = game.showHand(Player.fromString("Lisa"), ROCK);
+    List<Event<?>> gameEvents = game.showHand(Player.fromString("Lisa"), ROCK);
 
     assertThat(gameEvents.size(), is(0));
   }
@@ -85,7 +91,7 @@ public class GameTest {
         // Round 1
         showHand(Player.fromString("Lisa"), ROCK));
 
-    List<Event> gameEvents = game.showHand(Player.fromString("Bob"), PAPER);
+    List<Event<?>> gameEvents = game.showHand(Player.fromString("Bob"), PAPER);
     assertThat(gameEvents.size(), is(3));
     Event<PlayerAnswered> playerAnswered = firstEventOfType(gameEvents, PlayerAnswered.class);
     assertThat(playerAnswered.getData().player, is("Bob"));
@@ -107,7 +113,7 @@ public class GameTest {
         showHand(Player.fromString("Lisa"), ROCK));
 
 
-    List<Event> gameEvents = game.showHand(Player.fromString("Bob"), ROCK);
+    List<Event<?>> gameEvents = game.showHand(Player.fromString("Bob"), ROCK);
 
     assertThat(gameEvents.size(), is(2));
     Event<PlayerAnswered> playerAnswered = firstEventOfType(gameEvents, PlayerAnswered.class);
@@ -136,7 +142,7 @@ public class GameTest {
         // Round 3
         showHand(Player.fromString("Lisa"), ROCK));
 
-    List<Event> gameEvents = game.showHand(Player.fromString("Bob"), PAPER);
+    List<Event<?>> gameEvents = game.showHand(Player.fromString("Bob"), PAPER);
 
     assertThat(gameEvents.size(), is(4));
     Event<PlayerAnswered> playerAnswered = firstEventOfType(gameEvents, PlayerAnswered.class);
@@ -171,14 +177,14 @@ public class GameTest {
         // Round 2
         showHand(Player.fromString("Bob"), PAPER));
 
-    List<Event> gameEvents = game.showHand(Player.fromString("Lisa"), ROCK);
+    List<Event<?>> gameEvents = game.showHand(Player.fromString("Lisa"), ROCK);
     assertThat(gameEvents.size(), is(4));
 
     Event<GameFinished> gameFinished = firstEventOfType(gameEvents, GameFinished.class);
     assertThat(gameFinished.getData().winner, is("Bob"));
   }
 
-  private <T> Event<T> firstEventOfType(List<Event> gameEvents, Class<T> clazz) {
+  private <T> Event<T> firstEventOfType(List<Event<?>> gameEvents, Class<T> clazz) {
     return (Event<T>) gameEvents.stream()
         .filter(e -> e.getEventType().equals(clazz.getSimpleName())).findFirst()
         .orElseThrow(() -> new RuntimeException("Missing event"));

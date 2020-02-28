@@ -34,7 +34,7 @@ public class TodoListTest {
     UUID listId = UUID.randomUUID();
     String name = "My List";
 
-    List<Event> listEvents = todoList.createNew(listId, name);
+    List<Event<?>> listEvents = todoList.createNew(listId, name);
     assertThat(listEvents.size(), is(1));
 
     Event<TodoListCreated> todoListCreated = firstEventOfType(listEvents, TodoListCreated.class);
@@ -51,7 +51,7 @@ public class TodoListTest {
     UUID todoId = UUID.randomUUID();
     String todoText = "Buy milk";
 
-    List<Event> listEvents = todoList.addTodo(todoId, todoText);
+    List<Event<?>> listEvents = todoList.addTodo(todoId, todoText);
     assertThat(listEvents.size(), is(1));
 
     Event<TodoAdded> todoAdded = firstEventOfType(listEvents, TodoAdded.class);
@@ -69,7 +69,7 @@ public class TodoListTest {
         addTodo(todoId, "Buy milk")
     );
 
-    List<Event> listEvents = todoList.completeTodo(todoId);
+    List<Event<?>> listEvents = todoList.completeTodo(todoId);
     assertThat(listEvents.size(), is(2));
 
     Event<TodoCompleted> todoCompleted = firstEventOfType(listEvents, TodoCompleted.class);
@@ -87,7 +87,7 @@ public class TodoListTest {
     return g -> g.addTodo(todoId, text);
   }
 
-  private <T> Event<T> firstEventOfType(List<Event> events, Class<T> clazz) {
+  private <T> Event<T> firstEventOfType(List<Event<?>> events, Class<T> clazz) {
     return (Event<T>) events.stream()
         .filter(e -> e.getEventType().equals(clazz.getSimpleName())).findFirst()
         .orElseThrow(() -> new RuntimeException("Missing event"));
