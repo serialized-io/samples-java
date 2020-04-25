@@ -11,6 +11,7 @@ import io.serialized.samples.encryption.crypto.impl.DummyCryptoKeyRepository;
 import java.util.Optional;
 import java.util.UUID;
 
+import static io.serialized.client.feed.FeedRequests.getFromFeed;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 
 public class DecryptionTest {
@@ -30,9 +31,8 @@ public class DecryptionTest {
     CryptoKeyRepository cryptoKeyRepository = new DummyCryptoKeyRepository();
 
     FeedClient feedClient = FeedClient.feedClient(config).build();
-    FeedClient.FeedRequest feed = feedClient.feed("customer");
 
-    feed.execute(0, feedEntry -> {
+    feedClient.execute(getFromFeed("customer").build(), 0, feedEntry -> {
       System.out.printf("Processing entry with sequence number [%s] - ", feedEntry.sequenceNumber());
 
       for (Event event : feedEntry.events()) {
