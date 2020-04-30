@@ -19,18 +19,18 @@ public class TodoListState {
   private final Map<UUID, String> todosLeft = new LinkedHashMap<>();
 
   public TodoListState handleTodoListCreated(Event<TodoListCreated> event) {
-    this.listId = event.getData().getListId();
+    this.listId = event.data().getListId();
     return this;
   }
 
   public TodoListState handleTodoAdded(Event<TodoAdded> event) {
-    this.todos.put(event.getData().getTodoId(), event.getData().getText());
-    this.todosLeft.put(event.getData().getTodoId(), event.getData().getText());
+    this.todos.put(event.data().getTodoId(), event.data().getText());
+    this.todosLeft.put(event.data().getTodoId(), event.data().getText());
     return this;
   }
 
   public TodoListState handleTodoCompleted(Event<TodoCompleted> event) {
-    this.todosLeft.remove(event.getData().getTodoId());
+    this.todosLeft.remove(event.data().getTodoId());
     return this;
   }
 

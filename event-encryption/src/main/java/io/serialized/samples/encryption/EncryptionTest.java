@@ -47,7 +47,7 @@ public class EncryptionTest {
 
     System.out.println("Storing aggregate: " + aggregateId);
     System.out.println("\tsecretMessage: " + secretMessage);
-    System.out.println("\tencryptedData: " + event.getEncryptedData());
+    System.out.println("\tencryptedData: " + event.encryptedData());
 
     aggregateClient.save(saveRequest().withAggregateId(aggregateId).withEvent(event).build());
 

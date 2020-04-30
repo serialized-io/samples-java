@@ -1,9 +1,20 @@
 package io.serialized.samples.rockpaperscissors.domain;
 
 import io.serialized.client.aggregate.Event;
-import io.serialized.samples.rockpaperscissors.domain.event.*;
+import io.serialized.samples.rockpaperscissors.domain.event.GameFinished;
+import io.serialized.samples.rockpaperscissors.domain.event.GameStarted;
+import io.serialized.samples.rockpaperscissors.domain.event.PlayerAnswered;
+import io.serialized.samples.rockpaperscissors.domain.event.PlayerWonRound;
+import io.serialized.samples.rockpaperscissors.domain.event.RoundFinished;
+import io.serialized.samples.rockpaperscissors.domain.event.RoundStarted;
+import io.serialized.samples.rockpaperscissors.domain.event.RoundTied;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -63,12 +74,12 @@ public class GameState {
 
   public GameState handleGameStarted(Event<GameStarted> event) {
     gameStatus = GameStatus.STARTED;
-    registeredPlayers.addAll(event.getData().players.stream().map(Player::fromString).collect(toSet()));
+    registeredPlayers.addAll(event.data().players.stream().map(Player::fromString).collect(toSet()));
     return this;
   }
 
   public GameState handlePlayerWonRound(Event<PlayerWonRound> event) {
-    Player winner = Player.fromString(event.getData().winner);
+    Player winner = Player.fromString(event.data().winner);
     long numberOfWins = wins.getOrDefault(winner, 0L);
     wins.put(winner, numberOfWins + 1);
     return this;
@@ -79,8 +90,8 @@ public class GameState {
   }
 
   public GameState handlePlayerAnswered(Event<PlayerAnswered> event) {
-    Player player = Player.fromString(event.getData().player);
-    shownHands.add(new PlayerHand(player, event.getData().answer));
+    Player player = Player.fromString(event.data().player);
+    shownHands.add(new PlayerHand(player, event.data().answer));
     return this;
   }
 

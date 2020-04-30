@@ -38,8 +38,8 @@ public class TodoListTest {
     assertThat(listEvents.size(), is(1));
 
     Event<TodoListCreated> todoListCreated = firstEventOfType(listEvents, TodoListCreated.class);
-    assertThat(todoListCreated.getData().getListId(), is(listId));
-    assertThat(todoListCreated.getData().getName(), is(name));
+    assertThat(todoListCreated.data().getListId(), is(listId));
+    assertThat(todoListCreated.data().getName(), is(name));
   }
 
   @Test
@@ -55,8 +55,8 @@ public class TodoListTest {
     assertThat(listEvents.size(), is(1));
 
     Event<TodoAdded> todoAdded = firstEventOfType(listEvents, TodoAdded.class);
-    assertThat(todoAdded.getData().getTodoId(), is(todoId));
-    assertThat(todoAdded.getData().getText(), is(todoText));
+    assertThat(todoAdded.data().getTodoId(), is(todoId));
+    assertThat(todoAdded.data().getText(), is(todoText));
   }
 
   @Test
@@ -73,10 +73,10 @@ public class TodoListTest {
     assertThat(listEvents.size(), is(2));
 
     Event<TodoCompleted> todoCompleted = firstEventOfType(listEvents, TodoCompleted.class);
-    assertThat(todoCompleted.getData().getTodoId(), is(todoId));
+    assertThat(todoCompleted.data().getTodoId(), is(todoId));
 
     Event<TodoListCompleted> todoListCompleted = firstEventOfType(listEvents, TodoListCompleted.class);
-    assertThat(todoListCompleted.getData().getListId(), is(listId));
+    assertThat(todoListCompleted.data().getListId(), is(listId));
   }
 
   private Command<TodoList> createNewList(UUID listId, String name) {
@@ -89,7 +89,7 @@ public class TodoListTest {
 
   private <T> Event<T> firstEventOfType(List<Event<?>> events, Class<T> clazz) {
     return (Event<T>) events.stream()
-        .filter(e -> e.getEventType().equals(clazz.getSimpleName())).findFirst()
+        .filter(e -> e.eventType().equals(clazz.getSimpleName())).findFirst()
         .orElseThrow(() -> new RuntimeException("Missing event"));
   }
 

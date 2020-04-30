@@ -13,7 +13,7 @@ public class HighScoreProjection extends ValueObject {
 
   public static HighScoreProjection fromProjections(ProjectionsResponse<HighScore> highScores) {
     HighScoreProjection highScoreProjection = new HighScoreProjection();
-    highScoreProjection.highScores = highScores.projections.stream().map(p -> p.data).collect(toList());
+    highScoreProjection.highScores = highScores.projections().stream().map(p -> p.data()).collect(toList());
     return highScoreProjection;
   }
 

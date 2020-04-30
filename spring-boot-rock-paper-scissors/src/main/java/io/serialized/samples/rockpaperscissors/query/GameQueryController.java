@@ -31,7 +31,7 @@ public class GameQueryController {
   @ResponseBody
   public TotalGameStats gameStats() {
     ProjectionResponse<TotalGameStats> projection = projectionClient.query(aggregated("total-game-stats").build(TotalGameStats.class));
-    return projection.data;
+    return projection.data();
   }
 
 }

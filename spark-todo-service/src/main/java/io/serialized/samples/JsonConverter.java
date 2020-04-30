@@ -1,5 +1,7 @@
 package io.serialized.samples;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import spark.ResponseTransformer;
@@ -17,6 +19,7 @@ public class JsonConverter implements ResponseTransformer {
       .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
       .configure(WRITE_DATES_AS_TIMESTAMPS, false)
       .configure(INDENT_OUTPUT, true)
+      .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
       .setSerializationInclusion(NON_NULL);
 
   @Override

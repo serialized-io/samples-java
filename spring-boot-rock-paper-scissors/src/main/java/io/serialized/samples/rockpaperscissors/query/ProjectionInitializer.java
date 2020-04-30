@@ -5,7 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static io.serialized.client.projection.EventSelector.eventSelector;
-import static io.serialized.client.projection.Function.*;
+import static io.serialized.client.projection.Functions.inc;
+import static io.serialized.client.projection.Functions.merge;
+import static io.serialized.client.projection.Functions.set;
+import static io.serialized.client.projection.Functions.setref;
 import static io.serialized.client.projection.ProjectionDefinition.aggregatedProjection;
 import static io.serialized.client.projection.ProjectionDefinition.singleProjection;
 import static io.serialized.client.projection.RawData.rawData;

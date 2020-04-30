@@ -25,10 +25,10 @@ import java.util.Optional;
 
 import static io.serialized.client.aggregate.AggregateClient.aggregateClient;
 import static io.serialized.client.aggregate.AggregateRequest.saveRequest;
-import static io.serialized.client.projection.Function.merge;
-import static io.serialized.client.projection.Function.prepend;
-import static io.serialized.client.projection.Function.set;
-import static io.serialized.client.projection.Function.setref;
+import static io.serialized.client.projection.Functions.merge;
+import static io.serialized.client.projection.Functions.prepend;
+import static io.serialized.client.projection.Functions.set;
+import static io.serialized.client.projection.Functions.setref;
 import static io.serialized.client.projection.ProjectionDefinition.singleProjection;
 import static io.serialized.client.projection.RawData.rawData;
 import static io.serialized.client.projection.TargetFilter.targetFilter;
