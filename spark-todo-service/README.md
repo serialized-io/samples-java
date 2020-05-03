@@ -116,3 +116,4 @@ Available list statuses are *EMPTY*, *IN_PROGRESS* and *COMPLETED*.
 ```
 curl http://localhost:8080/queries/lists?status=COMPLETED
 ```
+

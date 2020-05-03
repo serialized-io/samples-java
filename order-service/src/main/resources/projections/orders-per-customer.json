@@ -8,7 +8,7 @@
       "eventType": "OrderPlacedEvent",
       "functions": [
         {
-          "function": "push",
+          "function": "append",
           "targetSelector": "$.projection.orders"
         },
         {
