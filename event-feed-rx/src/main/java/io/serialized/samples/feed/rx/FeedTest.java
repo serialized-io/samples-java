@@ -7,7 +7,7 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 
-import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 
 public class FeedTest {
 

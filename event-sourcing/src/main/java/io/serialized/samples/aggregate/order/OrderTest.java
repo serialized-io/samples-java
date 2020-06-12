@@ -1,6 +1,10 @@
 package io.serialized.samples.aggregate.order;
 
-import io.serialized.samples.order.domain.*;
+import io.serialized.samples.order.domain.Amount;
+import io.serialized.samples.order.domain.CustomerId;
+import io.serialized.samples.order.domain.Order;
+import io.serialized.samples.order.domain.OrderId;
+import io.serialized.samples.order.domain.OrderState;
 import io.serialized.samples.order.domain.event.OrderCancelledEvent;
 import io.serialized.samples.order.domain.event.OrderEvent;
 import io.serialized.samples.order.domain.event.OrderPlacedEvent;
@@ -13,7 +17,7 @@ import java.util.Optional;
 import static io.serialized.samples.order.domain.CustomerId.newCustomerId;
 import static io.serialized.samples.order.domain.OrderId.newOrderId;
 import static io.serialized.samples.order.domain.TrackingNumber.newTrackingNumber;
-import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 
 public class OrderTest {
 

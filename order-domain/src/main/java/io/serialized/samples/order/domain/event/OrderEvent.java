@@ -3,16 +3,16 @@ package io.serialized.samples.order.domain.event;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.serialized.samples.order.domain.OrderState;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
 import java.util.UUID;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.EXISTING_PROPERTY;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
-import static org.apache.commons.lang.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 /**
  * Base class for all order events. Will be used by Jackson Serializer for polymorphism.

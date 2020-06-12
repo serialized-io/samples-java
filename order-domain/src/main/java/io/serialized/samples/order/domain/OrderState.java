@@ -1,13 +1,18 @@
 package io.serialized.samples.order.domain;
 
-import io.serialized.samples.order.domain.event.*;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import io.serialized.samples.order.domain.event.OrderCancelledEvent;
+import io.serialized.samples.order.domain.event.OrderEvent;
+import io.serialized.samples.order.domain.event.OrderFullyPaidEvent;
+import io.serialized.samples.order.domain.event.OrderPlacedEvent;
+import io.serialized.samples.order.domain.event.OrderShippedEvent;
+import io.serialized.samples.order.domain.event.PaymentReceivedEvent;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.List;
 
-import static org.apache.commons.lang.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 /**
  * Represents the immutable state of an {@link Order}.

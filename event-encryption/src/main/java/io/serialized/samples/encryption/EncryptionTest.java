@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static io.serialized.client.aggregate.AggregateRequest.saveRequest;
-import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 
 public class EncryptionTest {
 
