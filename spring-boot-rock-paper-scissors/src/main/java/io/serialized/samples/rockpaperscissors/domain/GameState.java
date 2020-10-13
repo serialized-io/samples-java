@@ -49,6 +49,10 @@ public class GameState {
     return Collections.unmodifiableSet(registeredPlayers);
   }
 
+  boolean isParticipant(Player player) {
+    return registeredPlayers.contains(player);
+  }
+
   Set<PlayerHand> shownHands() {
     return Collections.unmodifiableSet(shownHands);
   }

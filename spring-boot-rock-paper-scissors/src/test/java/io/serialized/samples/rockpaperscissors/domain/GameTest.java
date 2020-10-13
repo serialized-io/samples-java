@@ -18,9 +18,9 @@ import java.util.List;
 
 import static io.serialized.samples.rockpaperscissors.domain.Answer.PAPER;
 import static io.serialized.samples.rockpaperscissors.domain.Answer.ROCK;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 public class GameTest {
 
@@ -64,6 +64,16 @@ public class GameTest {
     Event<PlayerAnswered> playerAnswered = firstEventOfType(gameEvents, PlayerAnswered.class);
     assertThat(playerAnswered.data().player, is("Lisa"));
     assertThat(playerAnswered.data().answer, is(ROCK));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void nonParticipatingPlayerCannotShowHand() {
+
+    Game game = gameFactory.fromCommands(
+        // Start game
+        startGame(Player.fromString("Lisa"), Player.fromString("Bob")));
+
+    game.showHand(Player.fromString("Lisaaaa"), ROCK);
   }
 
   @Test

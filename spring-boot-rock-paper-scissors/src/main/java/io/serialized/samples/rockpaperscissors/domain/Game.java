@@ -49,6 +49,8 @@ public class Game {
 
   public List<Event<?>> showHand(Player player, Answer answer) {
 
+    assertIsParticipant(player);
+
     if (gameState.handAlreadyShown(new PlayerHand(player, answer))) {
       return emptyList();
     }
@@ -56,7 +58,7 @@ public class Game {
     gameState.assertAllowsMoreAnswers();
 
     if (gameState.hasPlayerAnswered(player)) {
-      throw new IllegalArgumentException("Player " + player.playerName + " has already answered");
+      throw new IllegalArgumentException("Player [" + player.playerName + "] has already answered");
     }
 
     PlayerHand playerHand = new PlayerHand(player, answer);
@@ -89,6 +91,12 @@ public class Game {
     }
 
     return events;
+  }
+
+  private void assertIsParticipant(Player player) {
+    if (!gameState.isParticipant(player)) {
+      throw new IllegalArgumentException("Player [" + player.playerName + "] is not participating in game");
+    }
   }
 
   Player calculateWinner(PlayerHand hand1, PlayerHand hand2) {
