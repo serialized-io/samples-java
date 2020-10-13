@@ -22,11 +22,12 @@ import static java.util.stream.Collectors.toSet;
  * The transient state of a game, built up from different events
  */
 public class GameState {
-  private GameStatus gameStatus = GameStatus.NEW;
 
-  private Set<Player> registeredPlayers = new LinkedHashSet<>();
-  private Set<PlayerHand> shownHands = new HashSet<>();
-  private Map<Player, Long> wins = new HashMap<>();
+  private final Set<Player> registeredPlayers = new LinkedHashSet<>();
+  private final Set<PlayerHand> shownHands = new HashSet<>();
+  private final Map<Player, Long> wins = new HashMap<>();
+
+  private GameStatus gameStatus = GameStatus.NEW;
 
   public static GameState newGame() {
     return new GameState();
@@ -109,4 +110,5 @@ public class GameState {
     this.gameStatus = GameStatus.FINISHED;
     return this;
   }
+
 }
