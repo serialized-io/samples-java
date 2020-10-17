@@ -1,4 +1,4 @@
-# Serialized Event Projector Lambda
+# Serialized AWS Event Projector Lambda
 
 This example describes how to create and deploy an AWS Lambda function acting as a
 [Serialized](https://serialized.io) [projector](https://docs.serialized.io/api-reference/basics/getting-started/projections).

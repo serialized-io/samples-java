@@ -11,8 +11,8 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>aws-event-projector-lambda</module>
     <module>event-encryption</module>
-    <module>event-projector-lambda</module>
     <module>spark-todo-service</module>
     <module>spring-boot-rock-paper-scissors</module>
   </modules>
