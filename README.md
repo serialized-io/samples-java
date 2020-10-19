@@ -19,7 +19,7 @@ Example how to create a custom projector, deployed as an AWS Lambda, for events 
 
 ## [event-encryption](https://github.com/serialized-io/samples-java/tree/master/event-encryption)
 
-Shows how to utilized client-side encryption before storing events in Serialized.
+Shows how to utilize client-side encryption before storing events in Serialized.
 
 ## [spark-todo-service](https://github.com/serialized-io/samples-java/tree/master/spark-todo-service)
 
