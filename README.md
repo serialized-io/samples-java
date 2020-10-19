@@ -17,15 +17,19 @@ mvn clean package
 
 Example how to create a custom projector, deployed as an AWS Lambda, for events stored in Serialized.
 
+## [dropwizard-order-service](https://github.com/serialized-io/samples-java/tree/master/dropwizard-order-service)
+
+Dropwizard CQRS/EventSourcing backend showing various aspects of the Serialized API:s.
+
 ## [event-encryption](https://github.com/serialized-io/samples-java/tree/master/event-encryption)
 
 Shows how to utilize client-side encryption before storing events in Serialized.
 
 ## [spark-todo-service](https://github.com/serialized-io/samples-java/tree/master/spark-todo-service)
 
-Tiny backend showing various aspects of the Serialized API:s.
+Tiny CQRS/EventSourcing backend showing various aspects of the Serialized API:s.
 
 ## [spring-boot-rock-paper-scissors](https://github.com/serialized-io/samples-java/tree/master/spring-boot-rock-paper-scissors)
 
-Spring Boot backend showing various aspects of the Serialized API:s.
+Spring Boot CQRS/EventSourcing backend showing various aspects of the Serialized API:s.
 
