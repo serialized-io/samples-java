@@ -8,14 +8,14 @@ import io.serialized.samples.domain.event.TodoAdded;
 import io.serialized.samples.domain.event.TodoCompleted;
 import io.serialized.samples.domain.event.TodoListCompleted;
 import io.serialized.samples.domain.event.TodoListCreated;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class TodoListTest {
 
@@ -35,11 +35,11 @@ public class TodoListTest {
     String name = "My List";
 
     List<Event<?>> listEvents = todoList.createNew(listId, name);
-    assertThat(listEvents.size(), is(1));
+    assertThat(listEvents).hasSize(1);
 
     Event<TodoListCreated> todoListCreated = firstEventOfType(listEvents, TodoListCreated.class);
-    assertThat(todoListCreated.data().getListId(), is(listId));
-    assertThat(todoListCreated.data().getName(), is(name));
+    assertThat(todoListCreated.data().getListId()).isEqualTo(listId);
+    assertThat(todoListCreated.data().getName()).isEqualTo(name);
   }
 
   @Test
@@ -52,11 +52,11 @@ public class TodoListTest {
     String todoText = "Buy milk";
 
     List<Event<?>> listEvents = todoList.addTodo(todoId, todoText);
-    assertThat(listEvents.size(), is(1));
+    assertThat(listEvents).hasSize(1);
 
     Event<TodoAdded> todoAdded = firstEventOfType(listEvents, TodoAdded.class);
-    assertThat(todoAdded.data().getTodoId(), is(todoId));
-    assertThat(todoAdded.data().getText(), is(todoText));
+    assertThat(todoAdded.data().getTodoId()).isEqualTo(todoId);
+    assertThat(todoAdded.data().getText()).isEqualTo(todoText);
   }
 
   @Test
@@ -70,13 +70,13 @@ public class TodoListTest {
     );
 
     List<Event<?>> listEvents = todoList.completeTodo(todoId);
-    assertThat(listEvents.size(), is(2));
+    assertThat(listEvents).hasSize(2);
 
     Event<TodoCompleted> todoCompleted = firstEventOfType(listEvents, TodoCompleted.class);
-    assertThat(todoCompleted.data().getTodoId(), is(todoId));
+    assertThat(todoCompleted.data().getTodoId()).isEqualTo(todoId);
 
     Event<TodoListCompleted> todoListCompleted = firstEventOfType(listEvents, TodoListCompleted.class);
-    assertThat(todoListCompleted.data().getListId(), is(listId));
+    assertThat(todoListCompleted.data().getListId()).isEqualTo(listId);
   }
 
   private Command<TodoList> createNewList(UUID listId, String name) {
