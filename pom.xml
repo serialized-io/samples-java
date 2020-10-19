@@ -12,6 +12,7 @@
 
   <modules>
     <module>aws-event-projector-lambda</module>
+    <module>dropwizard-order-service</module>
     <module>event-encryption</module>
     <module>spark-todo-service</module>
     <module>spring-boot-rock-paper-scissors</module>
@@ -21,7 +22,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven-enforcer.version>1.4.1</maven-enforcer.version>
-    <maven-compiler.version>3.6.1</maven-compiler.version>
+    <maven-compiler.version>3.8.1</maven-compiler.version>
     <exec.cleanupDaemonThreads>false</exec.cleanupDaemonThreads>
   </properties>
 
@@ -31,12 +32,6 @@
         <groupId>io.serialized</groupId>
         <artifactId>serialized-client</artifactId>
         <version>6.8.2</version>
-      </dependency>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.13.1</version>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -66,5 +61,38 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler.version}</version>
+          <configuration>
+            <source>1.8</source>
+            <target>1.8</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.22.2</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
 </project>
