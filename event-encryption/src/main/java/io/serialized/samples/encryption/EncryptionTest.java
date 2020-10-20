@@ -31,7 +31,7 @@ public class EncryptionTest {
     EncryptionService encryptionService = new AesEncryptionService();
     CryptoKeyRepository cryptoKeyRepository = new DummyCryptoKeyRepository();
 
-    AggregateClient<Object> aggregateClient = AggregateClient.aggregateClient("customer", Object.class, config).build();
+    AggregateClient<Void> aggregateClient = AggregateClient.aggregateClient("customer", Void.class, config).build();
 
     UUID customerId = UUID.randomUUID();
 
@@ -39,7 +39,7 @@ public class EncryptionTest {
     String secretMessage = "This is a secret message created at " + Instant.now();
     String encryptedData = encryptionService.encrypt(secretKey, secretMessage);
 
-    Event event = Event.newEvent("CustomerRegistered")
+    Event<?> event = Event.newEvent("CustomerRegistered")
         .data("customerId", customerId)
         .encryptedData(encryptedData).build();
 
