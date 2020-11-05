@@ -92,11 +92,11 @@ public class OrderCommandResourceTest {
     OrderId orderId = OrderId.fromUUID(request.orderId);
     CustomerId customerId = CustomerId.newId();
 
-    AggregateApiStub.AggregateResponse card = new AggregateApiStub.AggregateResponse(
+    AggregateApiStub.AggregateResponse order = new AggregateApiStub.AggregateResponse(
         request.orderId.toString(), "order", 1, singletonList(orderPlaced(orderId, customerId, new Amount(1234L), currentTimeMillis())
     ));
 
-    when(aggregateApiCallback.aggregateLoaded(eq("order"), eq(request.orderId))).thenReturn(card);
+    when(aggregateApiCallback.aggregateLoaded(eq("order"), eq(request.orderId))).thenReturn(order);
     when(aggregateApiCallback.eventsStored(eq(request.orderId), any(EventBatch.class))).thenReturn(OK);
 
     // when
@@ -118,11 +118,11 @@ public class OrderCommandResourceTest {
     OrderId orderId = OrderId.fromUUID(request.orderId);
     CustomerId customerId = CustomerId.newId();
 
-    AggregateApiStub.AggregateResponse card = new AggregateApiStub.AggregateResponse(
+    AggregateApiStub.AggregateResponse order = new AggregateApiStub.AggregateResponse(
         request.orderId.toString(), "order", 1, singletonList(orderPlaced(orderId, customerId, new Amount(1234L), currentTimeMillis())
     ));
 
-    when(aggregateApiCallback.aggregateLoaded(eq("order"), eq(request.orderId))).thenReturn(card);
+    when(aggregateApiCallback.aggregateLoaded(eq("order"), eq(request.orderId))).thenReturn(order);
     when(aggregateApiCallback.eventsStored(eq(request.orderId), any(EventBatch.class))).thenReturn(OK);
 
     // when
@@ -145,13 +145,13 @@ public class OrderCommandResourceTest {
     OrderId orderId = OrderId.fromUUID(request.orderId);
     CustomerId customerId = CustomerId.newId();
 
-    AggregateApiStub.AggregateResponse card = new AggregateApiStub.AggregateResponse(
+    AggregateApiStub.AggregateResponse order = new AggregateApiStub.AggregateResponse(
         request.orderId.toString(), "order", 1, Arrays.asList(
         orderPlaced(orderId, customerId, new Amount(1234L), currentTimeMillis()),
         orderFullyPaid(orderId, customerId, currentTimeMillis())
     ));
 
-    when(aggregateApiCallback.aggregateLoaded(eq("order"), eq(request.orderId))).thenReturn(card);
+    when(aggregateApiCallback.aggregateLoaded(eq("order"), eq(request.orderId))).thenReturn(order);
     when(aggregateApiCallback.eventsStored(eq(request.orderId), any(EventBatch.class))).thenReturn(OK);
 
     // when
