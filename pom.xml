@@ -12,6 +12,7 @@
 
   <modules>
     <module>aws-event-projector-lambda</module>
+    <module>dropwizard-guessing-game</module>
     <module>dropwizard-order-service</module>
     <module>event-encryption</module>
     <module>spark-todo-service</module>

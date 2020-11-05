@@ -1,0 +1,10 @@
+serializedAccessKey: ${SERIALIZED_ACCESS_KEY:-}
+serializedSecretAccessKey: ${SERIALIZED_SECRET_ACCESS_KEY:-}
+
+server:
+  applicationConnectors:
+    - type: http
+      port: 8080
+  adminConnectors:
+    - type: http
+      port: 9080
