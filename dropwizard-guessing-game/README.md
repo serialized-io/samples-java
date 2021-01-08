@@ -16,7 +16,7 @@ mvn clean install
 export SERIALIZED_ACCESS_KEY=<your-access-key>
 export SERIALIZED_SECRET_ACCESS_KEY=<your-secret-key>
 
-java -jar target/guessing-game-1.0-SNAPSHOT.jar server config/dev.yml
+java -jar target/guessing-game.jar server config/dev.yml
 ``` 
 
 **Start a new guessing game**
