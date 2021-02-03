@@ -35,4 +35,14 @@ public class QueryResource {
     return Response.ok(projection).build();
   }
 
+  @GET
+  @Path("games/{gameId}/history")
+  public Response getGameHistory(@PathParam("gameId") String gameId) {
+
+    ProjectionQuery query = single("game-history").id(gameId).build(GameHistoryProjection.class);
+    ProjectionResponse<GameHistoryProjection> response = projectionClient.query(query);
+    GameHistoryProjection projection = response.data();
+    return Response.ok(projection).build();
+  }
+
 }

@@ -24,6 +24,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
 import static io.serialized.client.projection.EventSelector.eventSelector;
+import static io.serialized.client.projection.Functions.append;
 import static io.serialized.client.projection.Functions.inc;
 import static io.serialized.client.projection.Functions.set;
 import static io.serialized.client.projection.Functions.unset;
@@ -94,6 +95,14 @@ public class DemoApp extends Application<DemoAppConfig> {
               set()
                   .with(eventSelector("result"))
                   .with(targetSelector("result"))
+                  .build())
+          .build());
+
+      projectionClient.createOrUpdate(singleProjection("game-history") // Name projection
+          .feed("game") // Event feed to project
+          .addHandler(PlayerGuessed.class.getSimpleName(),
+              append()
+                  .with(targetSelector("rounds"))
                   .build())
           .build());
 

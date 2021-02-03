@@ -91,3 +91,8 @@ Content-Length: 77
 }
 ```
 
+After you are done playing, make the following request to display the game history:
+
+```
+curl -i http://localhost:8080/queries/games/3dbc7063-76d6-4df2-8ab4-72d1f897563b/history
+```
