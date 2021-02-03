@@ -53,7 +53,7 @@ public class DemoApp extends Application<DemoAppConfig> {
     SerializedClientConfig serializedClientConfig = config.serializedClientConfig();
     AggregateClient<GameState> gameAggregateClient = config.gameAggregateClient(serializedClientConfig);
     ProjectionClient projectionClient = config.projectionClient(serializedClientConfig);
-    ReactionClient reactionClient = config.reactionClient(serializedClientConfig);
+    ReactionClient reactionClient = config.reactionClient(serializedClientConfig); // Not used yet...
 
     environment.jersey().register(new ApiExceptionMapper());
     // Register endpoints
