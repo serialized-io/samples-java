@@ -9,6 +9,7 @@ import io.serialized.client.SerializedClientConfig;
 import io.serialized.client.aggregate.AggregateClient;
 import io.serialized.client.projection.ProjectionClient;
 import io.serialized.client.reaction.ReactionClient;
+import io.serialized.samples.guessinggame.api.ApiExceptionMapper;
 import io.serialized.samples.guessinggame.api.CommandResource;
 import io.serialized.samples.guessinggame.api.QueryResource;
 import io.serialized.samples.guessinggame.domain.GameState;
@@ -54,6 +55,7 @@ public class DemoApp extends Application<DemoAppConfig> {
     ProjectionClient projectionClient = config.projectionClient(serializedClientConfig);
     ReactionClient reactionClient = config.reactionClient(serializedClientConfig);
 
+    environment.jersey().register(new ApiExceptionMapper());
     // Register endpoints
     environment.jersey().register(new CommandResource(gameAggregateClient));
     environment.jersey().register(new QueryResource(projectionClient));
