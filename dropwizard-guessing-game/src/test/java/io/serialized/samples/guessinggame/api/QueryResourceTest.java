@@ -39,7 +39,6 @@ public class QueryResourceTest {
   @BeforeEach
   public void setUp() {
     reset(projectionApiCallback);
-    resources.getObjectMapper().setSerializationInclusion(NON_NULL).setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
     dropwizard.getObjectMapper().setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
   }
 
