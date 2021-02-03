@@ -21,6 +21,10 @@ Example how to create a custom projector, deployed as an AWS Lambda, for events 
 
 Dropwizard CQRS/EventSourcing backend showing various aspects of the Serialized API:s.
 
+## [dropwizard-guessing-game](https://github.com/serialized-io/samples-java/tree/master/dropwizard-guessing-game)
+
+Dropwizard CQRS/EventSourcing backend showing various aspects of the Serialized API:s.
+
 ## [event-encryption](https://github.com/serialized-io/samples-java/tree/master/event-encryption)
 
 Shows how to utilize client-side encryption before storing events in Serialized.
