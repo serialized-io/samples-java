@@ -11,6 +11,7 @@ import io.serialized.client.projection.ProjectionClient;
 import io.serialized.client.reaction.ReactionClient;
 import io.serialized.samples.guessinggame.api.ApiExceptionMapper;
 import io.serialized.samples.guessinggame.api.CommandResource;
+import io.serialized.samples.guessinggame.api.IllegalStateExceptionMapper;
 import io.serialized.samples.guessinggame.api.QueryResource;
 import io.serialized.samples.guessinggame.domain.GameState;
 import io.serialized.samples.guessinggame.domain.event.GameFinished;
@@ -56,7 +57,9 @@ public class DemoApp extends Application<DemoAppConfig> {
     ProjectionClient projectionClient = config.projectionClient(serializedClientConfig);
     ReactionClient reactionClient = config.reactionClient(serializedClientConfig); // Not used yet...
 
-    environment.jersey().register(new ApiExceptionMapper());
+    environment.jersey().register(new ApiExceptionMapper()); // For showing error codes from Serialized
+    environment.jersey().register(new IllegalStateExceptionMapper()); // For showing domain logic errors
+
     // Register endpoints
     environment.jersey().register(new CommandResource(gameAggregateClient));
     environment.jersey().register(new QueryResource(projectionClient));
