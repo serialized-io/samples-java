@@ -103,7 +103,7 @@ public class GameTest {
   }
 
   @Test
-  public void shouldLooseGame() {
+  public void shouldLoseGame() {
     UUID id = UUID.randomUUID();
 
     Game game = new Game(gameStateBuilder.buildState(asList(
