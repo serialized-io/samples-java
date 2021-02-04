@@ -1,10 +1,14 @@
 package io.serialized.samples.rockpaperscissors.query;
 
 import io.serialized.client.projection.ProjectionClient;
+import io.serialized.samples.rockpaperscissors.domain.event.GameFinished;
+import io.serialized.samples.rockpaperscissors.domain.event.GameStarted;
+import io.serialized.samples.rockpaperscissors.domain.event.RoundFinished;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static io.serialized.client.projection.EventSelector.eventSelector;
+import static io.serialized.client.projection.Functions.append;
 import static io.serialized.client.projection.Functions.inc;
 import static io.serialized.client.projection.Functions.merge;
 import static io.serialized.client.projection.Functions.set;
@@ -29,7 +33,7 @@ public class ProjectionInitializer {
         singleProjection("high-score")
             .feed("game")
             .withIdField("winner")
-            .addHandler("GameFinished",
+            .addHandler(GameFinished.class.getSimpleName(),
                 inc().with(targetSelector("wins")).build(),
                 set().with(targetSelector("playerName")).with(eventSelector("winner")).build(),
                 setref().with(targetSelector("wins")).build())
@@ -40,10 +44,14 @@ public class ProjectionInitializer {
     projectionClient.createOrUpdate(
         singleProjection("games")
             .feed("game")
-            .addHandler("GameStarted",
+            .addHandler(GameStarted.class.getSimpleName(),
                 merge().build(),
                 set().with(targetSelector("status")).with(rawData("IN_PROGRESS")).build())
-            .addHandler("GameFinished",
+            .addHandler(RoundFinished.class.getSimpleName(),
+                append()
+                    .with(targetSelector("rounds"))
+                    .build())
+            .addHandler(GameFinished.class.getSimpleName(),
                 merge().build(),
                 set().with(targetSelector("status")).with(rawData("FINISHED")).build())
             .build());
@@ -52,7 +60,7 @@ public class ProjectionInitializer {
   public void totalStatsProjection() {
     projectionClient.createOrUpdate(aggregatedProjection("total-game-stats")
         .feed("game")
-        .addHandler("GameStarted", inc().with(targetSelector("gameCount")).build())
+        .addHandler(GameStarted.class.getSimpleName(), inc().with(targetSelector("gameCount")).build())
         .build());
   }
 
