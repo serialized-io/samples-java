@@ -3,8 +3,8 @@ package io.serialized.samples.jetty;
 import io.serialized.samples.rockpaperscissors.command.ShowHandCommand;
 import io.serialized.samples.rockpaperscissors.command.StartGameCommand;
 import io.serialized.samples.rockpaperscissors.domain.Answer;
+import io.serialized.samples.rockpaperscissors.query.HighScore;
 import io.serialized.samples.rockpaperscissors.query.TotalGameStats;
-import io.serialized.samples.rockpaperscissors.query.WinnersProjection;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -64,8 +64,8 @@ public class GameApplicationIT {
   public void printHighScore() {
     RestTemplate restTemplate = new RestTemplate();
     HttpEntity<?> headers = new HttpEntity<>(clientHeaders());
-    ResponseEntity<WinnersProjection> exchange = restTemplate.exchange(LOCAL_SERVER + "/high-score", HttpMethod.GET, headers, WinnersProjection.class);
-    System.out.println("HighScoreProjection = " + exchange.getBody().highScores);
+    ResponseEntity<HighScore> exchange = restTemplate.exchange(LOCAL_SERVER + "/high-score", HttpMethod.GET, headers, HighScore.class);
+    System.out.println("HighScoreProjection = " + exchange.getBody().winners);
   }
 
   @Test

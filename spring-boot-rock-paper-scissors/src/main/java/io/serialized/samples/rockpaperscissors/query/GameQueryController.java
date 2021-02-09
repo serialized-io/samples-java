@@ -27,8 +27,8 @@ public class GameQueryController {
 
   @RequestMapping(value = "/high-score", method = GET, produces = "application/json")
   @ResponseBody
-  public WinnersProjection highScore() {
-    return WinnersProjection.fromProjections(projectionClient.query(list("winners").build(HighScore.class)));
+  public HighScore highScore() {
+    return HighScore.fromProjections(projectionClient.query(list("winners").build(Winner.class)));
   }
 
   @RequestMapping(value = "/stats", method = GET, produces = "application/json")
