@@ -12,7 +12,6 @@ import static io.serialized.client.projection.Functions.append;
 import static io.serialized.client.projection.Functions.inc;
 import static io.serialized.client.projection.Functions.merge;
 import static io.serialized.client.projection.Functions.set;
-import static io.serialized.client.projection.Functions.setref;
 import static io.serialized.client.projection.ProjectionDefinition.aggregatedProjection;
 import static io.serialized.client.projection.ProjectionDefinition.singleProjection;
 import static io.serialized.client.projection.RawData.rawData;
@@ -28,15 +27,22 @@ public class ProjectionInitializer {
     this.projectionClient = projectionClient;
   }
 
-  public void createHighScoreProjection() {
+  public void createWinnersProjection() {
     projectionClient.createOrUpdate(
-        singleProjection("high-score")
+        singleProjection("winners")
             .feed("game")
             .withIdField("winner")
             .addHandler(GameFinished.class.getSimpleName(),
                 inc().with(targetSelector("wins")).build(),
-                set().with(targetSelector("playerName")).with(eventSelector("winner")).build(),
-                setref().with(targetSelector("wins")).build())
+                set().with(targetSelector("playerName")).with(eventSelector("winner")).build())
+            .build());
+    projectionClient.createOrUpdate(
+        singleProjection("high-score2")
+            .feed("game")
+            .withIdField("winner")
+            .addHandler(GameFinished.class.getSimpleName(),
+                inc().with(targetSelector("wins")).build(),
+                set().with(targetSelector("playerName")).with(eventSelector("winner")).build())
             .build());
   }
 
