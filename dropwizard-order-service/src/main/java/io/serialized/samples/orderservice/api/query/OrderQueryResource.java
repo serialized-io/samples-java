@@ -48,9 +48,9 @@ public class OrderQueryResource {
                             @QueryParam("skip") @DefaultValue("0") int skip,
                             @QueryParam("limit") @DefaultValue("100") int limit) {
 
-    ListProjectionQuery query = list("orders").reference(status)
-        .skip(skip)
-        .limit(limit)
+    ListProjectionQuery query = list("orders").withReference(status)
+        .withSkip(skip)
+        .withLimit(limit)
         .build(OrderProjection.class);
 
     ProjectionsResponse<OrderProjection> response = projectionClient.query(query);
@@ -63,7 +63,7 @@ public class OrderQueryResource {
   @Path("customers/{customerId}/orders")
   public Response getOrdersPerCustomer(@PathParam("customerId") String customerId) {
 
-    ProjectionQuery query = single("orders-per-customer").id(customerId).build(CustomerOrdersProjection.class);
+    ProjectionQuery query = single("orders-per-customer").withId(customerId).build(CustomerOrdersProjection.class);
     ProjectionResponse<CustomerOrdersProjection> response = projectionClient.query(query);
     OrdersResponseDto dto = toDto(response.data());
 
@@ -74,7 +74,7 @@ public class OrderQueryResource {
   @Path("orders/{orderId}")
   public Response getOrder(@PathParam("orderId") String orderId) {
 
-    ProjectionQuery query = single("orders").id(orderId).build(OrderProjection.class);
+    ProjectionQuery query = single("orders").withId(orderId).build(OrderProjection.class);
     ProjectionResponse<OrderProjection> response = projectionClient.query(query);
     OrderResponseDto dto = toDto(response.data());
 

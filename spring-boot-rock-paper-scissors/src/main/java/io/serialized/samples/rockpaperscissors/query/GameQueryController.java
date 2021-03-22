@@ -42,7 +42,7 @@ public class GameQueryController {
   @ResponseBody
   public GameProjection game(@PathVariable UUID gameId) {
     ProjectionResponse<GameProjection> game = projectionClient.query(single("games")
-        .id(gameId)
+        .withId(gameId)
         .build(GameProjection.class));
     return game.data();
   }

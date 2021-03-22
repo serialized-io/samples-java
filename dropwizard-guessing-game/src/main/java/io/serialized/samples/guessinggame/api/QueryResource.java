@@ -29,7 +29,7 @@ public class QueryResource {
   @Path("games/{gameId}")
   public Response getGame(@PathParam("gameId") String gameId) {
 
-    ProjectionQuery query = single("games").id(gameId).build(GameProjection.class);
+    ProjectionQuery query = single("games").withId(gameId).build(GameProjection.class);
     ProjectionResponse<GameProjection> response = projectionClient.query(query);
     GameProjection projection = response.data();
     return Response.ok(projection).build();
@@ -39,7 +39,7 @@ public class QueryResource {
   @Path("games/{gameId}/history")
   public Response getGameHistory(@PathParam("gameId") String gameId) {
 
-    ProjectionQuery query = single("game-history").id(gameId).build(GameHistoryProjection.class);
+    ProjectionQuery query = single("game-history").withId(gameId).build(GameHistoryProjection.class);
     ProjectionResponse<GameHistoryProjection> response = projectionClient.query(query);
     GameHistoryProjection projection = response.data();
     return Response.ok(projection).build();

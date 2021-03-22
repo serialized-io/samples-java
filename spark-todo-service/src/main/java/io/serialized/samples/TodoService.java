@@ -168,7 +168,7 @@ public class TodoService {
       if (queryParamsMap.hasValue()) {
         String status = queryParamsMap.value();
         logger.info("Returning all lists with status: {}", status);
-        return projectionClient.query(builder.reference(status).build(Map.class));
+        return projectionClient.query(builder.withReference(status).build(Map.class));
       } else {
         logger.info("Returning all lists");
         return projectionClient.query(builder.build(Map.class));
@@ -179,7 +179,7 @@ public class TodoService {
       String listId = request.params(":listId");
       logger.info("Returning lists with ID: {}", listId);
       // Fetch the projected to do list from Serialized
-      return projectionClient.query(ProjectionQueries.single("lists").id(listId).build(Map.class));
+      return projectionClient.query(ProjectionQueries.single("lists").withId(listId).build(Map.class));
     }, new JsonConverter());
 
     exception(IllegalArgumentException.class, (exception, request, response) -> {

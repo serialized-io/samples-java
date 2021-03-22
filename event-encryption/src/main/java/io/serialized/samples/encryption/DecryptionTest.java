@@ -3,6 +3,7 @@ package io.serialized.samples.encryption;
 import io.serialized.client.SerializedClientConfig;
 import io.serialized.client.feed.Event;
 import io.serialized.client.feed.FeedClient;
+import io.serialized.client.feed.FeedResponse;
 import io.serialized.samples.encryption.crypto.CryptoKeyRepository;
 import io.serialized.samples.encryption.crypto.EncryptionService;
 import io.serialized.samples.encryption.crypto.impl.AesEncryptionService;
@@ -32,17 +33,16 @@ public class DecryptionTest {
 
     FeedClient feedClient = FeedClient.feedClient(config).build();
 
-    feedClient.execute(getFromFeed("customer").build(), 0, feedEntry -> {
-      System.out.printf("Processing entry with sequence number [%s] - ", feedEntry.sequenceNumber());
+    FeedResponse response = feedClient.execute(getFromFeed("customer").build(), 0);
 
-      for (Event event : feedEntry.events()) {
-        UUID customerId = UUID.fromString(event.dataValueAs("customerId", String.class));
-        byte[] secretKey = cryptoKeyRepository.getSecretKey(customerId);
-        String decryptedSecret = (String) encryptionService.decrypt(secretKey, event.encryptedData());
-        System.out.printf("DecryptedSecret = [%s]\n", decryptedSecret);
-      }
+    System.out.printf("Processing entry with sequence number [%s] - ", response.currentSequenceNumber());
 
-    });
+    for (Event event : response.events()) {
+      UUID customerId = UUID.fromString(event.dataValueAs("customerId", String.class));
+      byte[] secretKey = cryptoKeyRepository.getSecretKey(customerId);
+      String decryptedSecret = (String) encryptionService.decrypt(secretKey, event.encryptedData());
+      System.out.printf("DecryptedSecret = [%s]\n", decryptedSecret);
+    }
 
     System.out.println("Done!");
   }
