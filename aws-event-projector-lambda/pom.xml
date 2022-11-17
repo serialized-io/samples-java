@@ -14,8 +14,8 @@
   <name>aws-event-projector-lambda</name>
 
   <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>13</maven.compiler.source>
+    <maven.compiler.target>13</maven.compiler.target>
     <jersey.version>2.26</jersey.version>
   </properties>
 
