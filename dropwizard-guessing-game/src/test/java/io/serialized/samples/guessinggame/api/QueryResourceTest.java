@@ -16,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import javax.ws.rs.core.Response;
 import java.util.UUID;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -50,11 +49,11 @@ public class QueryResourceTest {
     projection.guessCount = 0;
 
     ProjectionResponse<GameProjection> projectionResponse = new ProjectionResponse<>(
-        gameId.toString(), System.currentTimeMillis(), projection);
+        gameId.toString(), System.currentTimeMillis(), System.currentTimeMillis(), projection);
 
     when(projectionApiCallback.singleProjectionLoaded("games", gameId)).thenReturn(projectionResponse);
 
-    Response response = resources.target("/queries/games/" + gameId.toString()).request().get();
+    Response response = resources.target("/queries/games/" + gameId).request().get();
 
     assertThat(response.getStatus()).isEqualTo(200);
     GameProjection payload = response.readEntity(GameProjection.class);
