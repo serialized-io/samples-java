@@ -2,7 +2,7 @@ package io.serialized.samples.orderservice.domain;
 
 import io.serialized.client.aggregate.Event;
 import io.serialized.client.aggregate.StateBuilder;
-import io.serialized.samples.orderservice.domain.event.OrderCancelled;
+import io.serialized.samples.orderservice.domain.event.OrderCanceled;
 import io.serialized.samples.orderservice.domain.event.OrderFullyPaid;
 import io.serialized.samples.orderservice.domain.event.OrderPlaced;
 import io.serialized.samples.orderservice.domain.event.OrderShipped;
@@ -24,7 +24,7 @@ public class OrderTest {
 
   private final StateBuilder<OrderState> orderStateBuilder = StateBuilder.stateBuilder(OrderState.class)
       .withHandler(OrderPlaced.class, OrderState::handleOrderPlaced)
-      .withHandler(OrderCancelled.class, OrderState::handleOrderCancelled)
+      .withHandler(OrderCanceled.class, OrderState::handleOrderCanceled)
       .withHandler(OrderFullyPaid.class, OrderState::handleOrderFullyPaid)
       .withHandler(PaymentReceived.class, OrderState::handlePaymentReceived)
       .withHandler(OrderShipped.class, OrderState::handleOrderShipped);
@@ -35,10 +35,11 @@ public class OrderTest {
     OrderId orderId = OrderId.newId();
     CustomerId customerId = CustomerId.newId();
     Order order = new Order(new OrderState());
-    List<Event<?>> events = order.place(orderId, customerId, new Amount(200));
+    List<Event<?>> events = order.place(orderId, customerId, "abc123", new Amount(200));
     Event<OrderPlaced> orderPlaced = (Event<OrderPlaced>) events.iterator().next();
     assertThat(orderPlaced.data().getOrderId()).isEqualTo(orderId.asUUID());
     assertThat(orderPlaced.data().getCustomerId()).isEqualTo(customerId.asUUID());
+    assertThat(orderPlaced.data().getSku()).isEqualTo("abc123");
     assertThat(orderPlaced.data().getOrderAmount()).isEqualTo(200L);
   }
 
@@ -49,7 +50,7 @@ public class OrderTest {
     CustomerId customerId = CustomerId.newId();
 
     Order order = new Order(orderStateBuilder.buildState(singletonList(
-        orderPlaced(orderId, customerId, new Amount(200), currentTimeMillis())
+        orderPlaced(orderId, customerId, "abc123", new Amount(200), currentTimeMillis())
     )));
 
     List<Event<?>> events = order.pay(new Amount(200));
@@ -71,7 +72,7 @@ public class OrderTest {
     CustomerId customerId = CustomerId.newId();
 
     Order order = new Order(orderStateBuilder.buildState(singletonList(
-        orderPlaced(orderId, customerId, new Amount(200), currentTimeMillis())
+        orderPlaced(orderId, customerId, "abc123", new Amount(200), currentTimeMillis())
     )));
 
     List<Event<?>> events = order.pay(new Amount(500));
@@ -107,7 +108,7 @@ public class OrderTest {
     CustomerId customerId = CustomerId.newId();
 
     Order order = new Order(orderStateBuilder.buildState(singletonList(
-        orderPlaced(orderId, customerId, new Amount(200), currentTimeMillis())
+        orderPlaced(orderId, customerId, "abc123", new Amount(200), currentTimeMillis())
     )));
 
     // when
@@ -140,17 +141,17 @@ public class OrderTest {
     CustomerId customerId = CustomerId.newId();
 
     Order order = new Order(orderStateBuilder.buildState(singletonList(
-        orderPlaced(orderId, customerId, new Amount(200), currentTimeMillis())
+        orderPlaced(orderId, customerId, "abc123", new Amount(200), currentTimeMillis())
     )));
 
     String reason = "DOA";
 
     List<Event<?>> events = order.cancel(reason);
 
-    Event<OrderCancelled> orderCancelled = firstEventOfType(events, OrderCancelled.class);
-    assertThat(orderCancelled.data().getOrderId()).isEqualTo(orderId.asUUID());
-    assertThat(orderCancelled.data().getCustomerId()).isEqualTo(customerId.asUUID());
-    assertThat(orderCancelled.data().getReason()).isEqualTo("DOA");
+    Event<OrderCanceled> orderCanceled = firstEventOfType(events, OrderCanceled.class);
+    assertThat(orderCanceled.data().getOrderId()).isEqualTo(orderId.asUUID());
+    assertThat(orderCanceled.data().getCustomerId()).isEqualTo(customerId.asUUID());
+    assertThat(orderCanceled.data().getReason()).isEqualTo("DOA");
   }
 
   @Test
@@ -159,10 +160,11 @@ public class OrderTest {
     OrderId orderId = OrderId.newId();
     CustomerId customerId = CustomerId.newId();
 
+    Amount orderAmount = new Amount(200);
     Order order = new Order(orderStateBuilder.buildState(asList(
-        orderPlaced(orderId, customerId, new Amount(200), currentTimeMillis()),
-        paymentReceived(orderId, customerId, new Amount(200), currentTimeMillis()),
-        orderFullyPaid(orderId, customerId, currentTimeMillis())
+        orderPlaced(orderId, customerId, "abc123", orderAmount, currentTimeMillis()),
+        paymentReceived(orderId, customerId, orderAmount, currentTimeMillis()),
+        orderFullyPaid(orderId, customerId, orderAmount, currentTimeMillis())
     )));
 
     TrackingNumber trackingNumber = TrackingNumber.newTrackingNumber();

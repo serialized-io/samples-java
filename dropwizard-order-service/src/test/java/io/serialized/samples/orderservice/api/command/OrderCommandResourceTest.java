@@ -69,6 +69,7 @@ public class OrderCommandResourceTest {
     PlaceOrderRequest request = new PlaceOrderRequest();
     request.orderId = UUID.randomUUID();
     request.customerId = UUID.randomUUID();
+    request.sku = "1234";
     request.orderAmount = 123456;
 
     when(aggregateApiCallback.eventsStored(eq(request.orderId), any(EventBatch.class))).thenReturn(OK);
@@ -93,7 +94,7 @@ public class OrderCommandResourceTest {
     CustomerId customerId = CustomerId.newId();
 
     AggregateApiStub.AggregateResponse order = new AggregateApiStub.AggregateResponse(
-        request.orderId.toString(), "order", 1, singletonList(orderPlaced(orderId, customerId, new Amount(1234L), currentTimeMillis())
+        request.orderId.toString(), "order", 1, singletonList(orderPlaced(orderId, customerId, "abc1232", new Amount(1234L), currentTimeMillis())
     ));
 
     when(aggregateApiCallback.aggregateLoaded(eq("order"), eq(request.orderId))).thenReturn(order);
@@ -104,7 +105,7 @@ public class OrderCommandResourceTest {
 
     // then
     assertThat(response.getStatus()).isEqualTo(200);
-    verify(aggregateApiCallback, times(1)).eventsStored(eq(request.orderId), argThat(containsEventType("OrderCancelled")));
+    verify(aggregateApiCallback, times(1)).eventsStored(eq(request.orderId), argThat(containsEventType("OrderCanceled")));
   }
 
   @Test
@@ -119,7 +120,7 @@ public class OrderCommandResourceTest {
     CustomerId customerId = CustomerId.newId();
 
     AggregateApiStub.AggregateResponse order = new AggregateApiStub.AggregateResponse(
-        request.orderId.toString(), "order", 1, singletonList(orderPlaced(orderId, customerId, new Amount(1234L), currentTimeMillis())
+        request.orderId.toString(), "order", 1, singletonList(orderPlaced(orderId, customerId, "abc123", new Amount(1234L), currentTimeMillis())
     ));
 
     when(aggregateApiCallback.aggregateLoaded(eq("order"), eq(request.orderId))).thenReturn(order);
@@ -145,10 +146,11 @@ public class OrderCommandResourceTest {
     OrderId orderId = OrderId.fromUUID(request.orderId);
     CustomerId customerId = CustomerId.newId();
 
+    Amount orderAmount = new Amount(1234L);
     AggregateApiStub.AggregateResponse order = new AggregateApiStub.AggregateResponse(
         request.orderId.toString(), "order", 1, Arrays.asList(
-        orderPlaced(orderId, customerId, new Amount(1234L), currentTimeMillis()),
-        orderFullyPaid(orderId, customerId, currentTimeMillis())
+        orderPlaced(orderId, customerId, "abc123", orderAmount, currentTimeMillis()),
+        orderFullyPaid(orderId, customerId, orderAmount, currentTimeMillis())
     ));
 
     when(aggregateApiCallback.aggregateLoaded(eq("order"), eq(request.orderId))).thenReturn(order);

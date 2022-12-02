@@ -13,13 +13,15 @@ public class OrderPlaced {
 
   private UUID orderId;
   private UUID customerId;
+  private String sku;
   private long orderAmount;
   private long placedAt;
 
-  public static Event<OrderPlaced> orderPlaced(OrderId orderId, CustomerId customerId, Amount orderAmount, long placedAt) {
+  public static Event<OrderPlaced> orderPlaced(OrderId orderId, CustomerId customerId, String sku, Amount orderAmount, long placedAt) {
     OrderPlaced event = new OrderPlaced();
     event.orderId = orderId.asUUID();
     event.customerId = customerId.asUUID();
+    event.sku = sku;
     event.orderAmount = orderAmount.amount;
     event.placedAt = placedAt;
     return newEvent(event).build();
@@ -31,6 +33,10 @@ public class OrderPlaced {
 
   public UUID getCustomerId() {
     return customerId;
+  }
+
+  public String getSku() {
+    return sku;
   }
 
   public long getOrderAmount() {
