@@ -12,7 +12,7 @@ import io.serialized.samples.orderservice.api.ApiExceptionMapper;
 import io.serialized.samples.orderservice.api.command.OrderCommandResource;
 import io.serialized.samples.orderservice.api.query.OrderQueryResource;
 import io.serialized.samples.orderservice.domain.OrderState;
-import io.serialized.samples.orderservice.domain.event.OrderCancelled;
+import io.serialized.samples.orderservice.domain.event.OrderCanceled;
 import io.serialized.samples.orderservice.domain.event.OrderFullyPaid;
 import io.serialized.samples.orderservice.domain.event.OrderPlaced;
 import io.serialized.samples.orderservice.domain.event.OrderShipped;
@@ -79,7 +79,7 @@ public class OrderApplication extends Application<OrderApplicationConfig> {
             merge().build(), // Merge all event field into projection
             set().with(targetSelector("status")).with(rawData("PLACED")).build(), // Add/populate a 'status' field
             setref().with(targetSelector("status")).build()) // Make it possible to query/filter on 'status' field.
-        .addHandler(OrderCancelled.class.getSimpleName(),
+        .addHandler(OrderCanceled.class.getSimpleName(),
             merge().build(), // Merge all event field into projection
             set().with(targetSelector("status")).with(rawData("CANCELLED")).build()) // Update 'status' field
         .addHandler(OrderFullyPaid.class.getSimpleName(),
@@ -99,7 +99,7 @@ public class OrderApplication extends Application<OrderApplicationConfig> {
                 .with(targetSelector("orders[?].status"))
                 .with(targetFilter("[?(@.orderId == $.event.orderId)]"))
                 .with(rawData("PLACED")).build())
-        .addHandler(OrderCancelled.class.getSimpleName(),
+        .addHandler(OrderCanceled.class.getSimpleName(),
             set() // Find and update 'status' field of given order in the projected array.
                 .with(targetSelector("orders[?].status"))
                 .with(targetFilter("[?(@.orderId == $.event.orderId)]"))
@@ -123,7 +123,7 @@ public class OrderApplication extends Application<OrderApplicationConfig> {
                 .with(eventSelector("orderAmount"))
                 .with(targetSelector("totalCustomerDebt"))
                 .build())
-        .addHandler(OrderCancelled.class.getSimpleName(),
+        .addHandler(OrderCanceled.class.getSimpleName(),
             subtract() // Subtract from total
                 .with(eventSelector("orderAmount"))
                 .with(targetSelector("totalCustomerDebt"))

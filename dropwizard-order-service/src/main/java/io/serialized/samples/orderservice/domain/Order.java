@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static io.serialized.samples.orderservice.domain.event.OrderCancelled.orderCancelled;
+import static io.serialized.samples.orderservice.domain.event.OrderCanceled.orderCanceled;
 import static io.serialized.samples.orderservice.domain.event.OrderFullyPaid.orderFullyPaid;
 import static io.serialized.samples.orderservice.domain.event.OrderPlaced.orderPlaced;
 import static io.serialized.samples.orderservice.domain.event.OrderShipped.orderShipped;
@@ -28,9 +28,9 @@ public class Order {
     this.orderAmount = state.getOrderAmount();
   }
 
-  public List<Event<?>> place(OrderId orderId, CustomerId customerId, Amount orderAmount) {
+  public List<Event<?>> place(OrderId orderId, CustomerId customerId, String sku, Amount orderAmount) {
     status.assertNotYetPlaced();
-    return singletonList(orderPlaced(orderId, customerId, orderAmount, currentTimeMillis()));
+    return singletonList(orderPlaced(orderId, customerId, sku, orderAmount, currentTimeMillis()));
   }
 
   public List<Event<?>> pay(Amount amount) {
@@ -40,7 +40,7 @@ public class Order {
     events.add(paymentReceived(orderId, customerId, amount, currentTimeMillis()));
 
     if (amount.largerThanEq(orderAmount)) {
-      events.add(orderFullyPaid(orderId, customerId, currentTimeMillis()));
+      events.add(orderFullyPaid(orderId, customerId, orderAmount, currentTimeMillis()));
     }
     return events;
   }
@@ -52,7 +52,7 @@ public class Order {
 
   public List<Event<?>> cancel(String reason) {
     status.assertPlaced();
-    return singletonList(orderCancelled(orderId, customerId, orderAmount, reason, currentTimeMillis()));
+    return singletonList(orderCanceled(orderId, customerId, reason, currentTimeMillis()));
   }
 
 }

@@ -15,6 +15,7 @@ public class PaymentReceived {
   private UUID customerId;
   private long amountPaid;
   private long receivedAt;
+  private long paidAt;
 
   public static Event<PaymentReceived> paymentReceived(OrderId orderId, CustomerId customerId, Amount amountPaid, long receivedAt) {
     PaymentReceived event = new PaymentReceived();
@@ -22,6 +23,7 @@ public class PaymentReceived {
     event.customerId = customerId.asUUID();
     event.amountPaid = amountPaid.amount;
     event.receivedAt = receivedAt;
+    event.paidAt = receivedAt;
     return newEvent(event).build();
   }
 
@@ -39,6 +41,10 @@ public class PaymentReceived {
 
   public long getReceivedAt() {
     return receivedAt;
+  }
+
+  public long getPaidAt() {
+    return paidAt;
   }
 
 }

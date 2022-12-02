@@ -44,7 +44,7 @@ public class OrderCommandResource {
     Amount orderAmount = new Amount(request.orderAmount);
     Order order = new Order(new OrderState());
     logger.info("Placing order: {}", orderId);
-    List<Event<?>> events = order.place(orderId, customerId, orderAmount);
+    List<Event<?>> events = order.place(orderId, customerId, request.sku, orderAmount);
     orderClient.save(saveRequest().withAggregateId(orderId.asUUID()).withEvents(events).build());
 
     return Response.ok().build();

@@ -1,7 +1,7 @@
 package io.serialized.samples.orderservice.domain;
 
 import io.serialized.client.aggregate.Event;
-import io.serialized.samples.orderservice.domain.event.OrderCancelled;
+import io.serialized.samples.orderservice.domain.event.OrderCanceled;
 import io.serialized.samples.orderservice.domain.event.OrderFullyPaid;
 import io.serialized.samples.orderservice.domain.event.OrderPlaced;
 import io.serialized.samples.orderservice.domain.event.OrderShipped;
@@ -26,7 +26,7 @@ public class OrderState {
     return this;
   }
 
-  public OrderState handleOrderCancelled(Event<OrderCancelled> event) {
+  public OrderState handleOrderCanceled(Event<OrderCanceled> event) {
     this.status = OrderStatus.CANCELLED;
     return this;
   }

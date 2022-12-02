@@ -5,7 +5,7 @@ import io.serialized.client.SerializedClientConfig;
 import io.serialized.client.aggregate.AggregateClient;
 import io.serialized.client.projection.ProjectionClient;
 import io.serialized.samples.orderservice.domain.OrderState;
-import io.serialized.samples.orderservice.domain.event.OrderCancelled;
+import io.serialized.samples.orderservice.domain.event.OrderCanceled;
 import io.serialized.samples.orderservice.domain.event.OrderFullyPaid;
 import io.serialized.samples.orderservice.domain.event.OrderPlaced;
 import io.serialized.samples.orderservice.domain.event.OrderShipped;
@@ -21,9 +21,9 @@ public class OrderApplicationConfig extends Configuration {
 
   public AggregateClient<OrderState> orderClient(SerializedClientConfig config) {
     return aggregateClient("order", OrderState.class, config)
-        .registerHandler(OrderCancelled.class, OrderState::handleOrderCancelled)
-        .registerHandler(OrderFullyPaid.class, OrderState::handleOrderFullyPaid)
         .registerHandler(OrderPlaced.class, OrderState::handleOrderPlaced)
+        .registerHandler(OrderCanceled.class, OrderState::handleOrderCanceled)
+        .registerHandler(OrderFullyPaid.class, OrderState::handleOrderFullyPaid)
         .registerHandler(OrderShipped.class, OrderState::handleOrderShipped)
         .registerHandler(PaymentReceived.class, OrderState::handlePaymentReceived)
         .build();
