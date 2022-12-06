@@ -94,7 +94,7 @@ public class OrderApplication extends Application<OrderApplicationConfig> {
         .feed("order")
         .addHandler(OrderFullyPaid.class.getSimpleName(),
             merge().build(), // Merge all event field into projection
-            set().with(targetSelector("paidAt")).build()) // Set timestamp for query/filtering from/to
+            setref().with(targetSelector("paidAt")).build()) // Set timestamp for query/filtering from/to
         .addHandler(OrderShipped.class.getSimpleName(),
             delete().build()) // Delete instance when the order has been shipped
         .build());
@@ -111,7 +111,7 @@ public class OrderApplication extends Application<OrderApplicationConfig> {
                 .with(rawData("PLACED")).build())
         .addHandler(OrderCanceled.class.getSimpleName(),
             merge() // Find and merge in fields from event
-                .with(targetSelector("orders[?].status"))
+                .with(targetSelector("orders[?]"))
                 .with(targetFilter("[?(@.orderId == $.event.orderId)]")).build(),
             set() // Find and update 'status' field of given order in the projected array.
                 .with(targetSelector("orders[?].status"))
@@ -119,7 +119,7 @@ public class OrderApplication extends Application<OrderApplicationConfig> {
                 .with(rawData("CANCELED")).build())
         .addHandler(OrderFullyPaid.class.getSimpleName(),
             merge() // Find and merge in fields from event
-                .with(targetSelector("orders[?].status"))
+                .with(targetSelector("orders[?]"))
                 .with(targetFilter("[?(@.orderId == $.event.orderId)]")).build(),
             set() // Find and update 'status' field of given order in the projected array.
                 .with(targetSelector("orders[?].status"))
@@ -127,7 +127,7 @@ public class OrderApplication extends Application<OrderApplicationConfig> {
                 .with(rawData("PAID")).build())
         .addHandler(OrderShipped.class.getSimpleName(),
             merge() // Find and merge in fields from event
-                .with(targetSelector("orders[?].status"))
+                .with(targetSelector("orders[?]"))
                 .with(targetFilter("[?(@.orderId == $.event.orderId)]")).build(),
             set() // Find and update 'status' field of given order in the projected array.
                 .with(targetSelector("orders[?].status"))
