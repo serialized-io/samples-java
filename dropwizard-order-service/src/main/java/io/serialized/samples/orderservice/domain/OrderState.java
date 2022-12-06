@@ -27,7 +27,7 @@ public class OrderState {
   }
 
   public OrderState handleOrderCanceled(Event<OrderCanceled> event) {
-    this.status = OrderStatus.CANCELLED;
+    this.status = OrderStatus.CANCELED;
     return this;
   }
 
