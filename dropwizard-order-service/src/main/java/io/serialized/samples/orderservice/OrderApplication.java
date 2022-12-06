@@ -16,7 +16,6 @@ import io.serialized.samples.orderservice.domain.event.OrderCanceled;
 import io.serialized.samples.orderservice.domain.event.OrderFullyPaid;
 import io.serialized.samples.orderservice.domain.event.OrderPlaced;
 import io.serialized.samples.orderservice.domain.event.OrderShipped;
-import io.serialized.samples.orderservice.domain.event.PaymentReceived;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,12 +25,11 @@ import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
 import static io.serialized.client.projection.EventSelector.eventSelector;
 import static io.serialized.client.projection.Functions.add;
 import static io.serialized.client.projection.Functions.append;
+import static io.serialized.client.projection.Functions.delete;
 import static io.serialized.client.projection.Functions.inc;
 import static io.serialized.client.projection.Functions.merge;
-import static io.serialized.client.projection.Functions.prepend;
 import static io.serialized.client.projection.Functions.set;
 import static io.serialized.client.projection.Functions.setref;
-import static io.serialized.client.projection.Functions.subtract;
 import static io.serialized.client.projection.ProjectionDefinition.aggregatedProjection;
 import static io.serialized.client.projection.ProjectionDefinition.singleProjection;
 import static io.serialized.client.projection.RawData.rawData;
@@ -73,15 +71,16 @@ public class OrderApplication extends Application<OrderApplicationConfig> {
 
   private void createOrUpdateProjections(ProjectionClient projectionClient) {
 
-    projectionClient.createOrUpdate(singleProjection("orders")
+    projectionClient.createOrUpdate(singleProjection("orders-by-id")
+        .description("All orders by ID")
         .feed("order")
         .addHandler(OrderPlaced.class.getSimpleName(),
             merge().build(), // Merge all event field into projection
             set().with(targetSelector("status")).with(rawData("PLACED")).build(), // Add/populate a 'status' field
-            setref().with(targetSelector("status")).build()) // Make it possible to query/filter on 'status' field.
+            setref().with(targetSelector("placedAt")).build()) // Make it possible to query/filter from/to on 'placedAt' timestamp field.
         .addHandler(OrderCanceled.class.getSimpleName(),
             merge().build(), // Merge all event field into projection
-            set().with(targetSelector("status")).with(rawData("CANCELLED")).build()) // Update 'status' field
+            set().with(targetSelector("status")).with(rawData("CANCELED")).build()) // Update 'status' field
         .addHandler(OrderFullyPaid.class.getSimpleName(),
             merge().build(), // Merge all event field into projection
             set().with(targetSelector("status")).with(rawData("PAID")).build()) // Update 'status' field
@@ -90,7 +89,18 @@ public class OrderApplication extends Application<OrderApplicationConfig> {
             set().with(targetSelector("status")).with(rawData("SHIPPED")).build()) // Update 'status' field
         .build());
 
+    projectionClient.createOrUpdate(singleProjection("orders-to-ship")
+        .description("Fully paid orders ready to be shipped")
+        .feed("order")
+        .addHandler(OrderFullyPaid.class.getSimpleName(),
+            merge().build(), // Merge all event field into projection
+            set().with(targetSelector("paidAt")).build()) // Set timestamp for query/filtering from/to
+        .addHandler(OrderShipped.class.getSimpleName(),
+            delete().build()) // Delete instance when the order has been shipped
+        .build());
+
     projectionClient.createOrUpdate(singleProjection("orders-per-customer")
+        .description("All orders per customer")
         .feed("order")
         .withIdField("customerId") // Use 'customerId' field as primary key instead of 'aggregateId'
         .addHandler(OrderPlaced.class.getSimpleName(),
@@ -100,50 +110,55 @@ public class OrderApplication extends Application<OrderApplicationConfig> {
                 .with(targetFilter("[?(@.orderId == $.event.orderId)]"))
                 .with(rawData("PLACED")).build())
         .addHandler(OrderCanceled.class.getSimpleName(),
+            merge() // Find and merge in fields from event
+                .with(targetSelector("orders[?].status"))
+                .with(targetFilter("[?(@.orderId == $.event.orderId)]")).build(),
             set() // Find and update 'status' field of given order in the projected array.
                 .with(targetSelector("orders[?].status"))
                 .with(targetFilter("[?(@.orderId == $.event.orderId)]"))
-                .with(rawData("CANCELLED")).build())
+                .with(rawData("CANCELED")).build())
         .addHandler(OrderFullyPaid.class.getSimpleName(),
+            merge() // Find and merge in fields from event
+                .with(targetSelector("orders[?].status"))
+                .with(targetFilter("[?(@.orderId == $.event.orderId)]")).build(),
             set() // Find and update 'status' field of given order in the projected array.
                 .with(targetSelector("orders[?].status"))
                 .with(targetFilter("[?(@.orderId == $.event.orderId)]"))
                 .with(rawData("PAID")).build())
         .addHandler(OrderShipped.class.getSimpleName(),
+            merge() // Find and merge in fields from event
+                .with(targetSelector("orders[?].status"))
+                .with(targetFilter("[?(@.orderId == $.event.orderId)]")).build(),
             set() // Find and update 'status' field of given order in the projected array.
                 .with(targetSelector("orders[?].status"))
                 .with(targetFilter("[?(@.orderId == $.event.orderId)]"))
                 .with(rawData("SHIPPED")).build())
         .build());
 
-    projectionClient.createOrUpdate(aggregatedProjection("total-customer-debt")
+    projectionClient.createOrUpdate(aggregatedProjection("total-revenue")
+        .description("The total revenue for all fully paid orders")
         .feed("order")
-        .addHandler(OrderPlaced.class.getSimpleName(),
-            add() // Summarize all customers' debt in one field called 'totalCustomerDebt'
+        .addHandler(OrderFullyPaid.class.getSimpleName(),
+            add() // Summarize all order amounts in one field called 'revenue'
                 .with(eventSelector("orderAmount"))
-                .with(targetSelector("totalCustomerDebt"))
-                .build())
-        .addHandler(OrderCanceled.class.getSimpleName(),
-            subtract() // Subtract from total
-                .with(eventSelector("orderAmount"))
-                .with(targetSelector("totalCustomerDebt"))
-                .build())
-        .addHandler(PaymentReceived.class.getSimpleName(),
-            subtract() // Subtract from total
-                .with(eventSelector("orderAmount"))
-                .with(targetSelector("totalCustomerDebt"))
+                .with(targetSelector("revenue"))
+                .build(),
+            set() // Field to show when last event was processed
+                .with(eventSelector("paidAt"))
+                .with(targetSelector("updatedAt"))
                 .build())
         .build());
 
-    projectionClient.createOrUpdate(aggregatedProjection("shipping-stats")
+    projectionClient.createOrUpdate(aggregatedProjection("shipped-orders-count")
+        .description("The total number of shipped orders")
         .feed("order")
         .addHandler(OrderShipped.class.getSimpleName(),
-            prepend() // Project all tracking numbers into an array.
-                .with(eventSelector("trackingNumber"))
-                .with(targetSelector("trackingNumbers"))
-                .build(),
             inc() // Update the total count
-                .with(targetSelector("shippedOrdersCount")).build())
+                .with(targetSelector("shippedOrdersCount")).build(),
+            set() // Field to show when last event was processed
+                .with(eventSelector("shippedAt"))
+                .with(targetSelector("updatedAt"))
+                .build())
         .build());
   }
 

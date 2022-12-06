@@ -2,7 +2,7 @@ package io.serialized.samples.orderservice.domain;
 
 public enum OrderStatus {
 
-  NEW, PLACED, CANCELLED, PAID, SHIPPED;
+  NEW, PLACED, CANCELED, PAID, SHIPPED;
 
   void assertNotYetPlaced() {
     if (NEW != this) throw new IllegalOrderStateException("Expected order to be NEW but was " + this);
