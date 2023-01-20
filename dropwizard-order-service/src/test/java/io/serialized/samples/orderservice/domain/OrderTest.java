@@ -127,7 +127,7 @@ public class OrderTest {
 
     // when
     Throwable exception = assertThrows(IllegalOrderStateException.class, () -> {
-      order.cancel("DOA");
+      order.cancel("Requested by customer");
     });
 
     // then
@@ -144,14 +144,14 @@ public class OrderTest {
         orderPlaced(orderId, customerId, "abc123", new Amount(200), currentTimeMillis())
     )));
 
-    String reason = "DOA";
+    String reason = "Requested by customer";
 
     List<Event<?>> events = order.cancel(reason);
 
     Event<OrderCanceled> orderCanceled = firstEventOfType(events, OrderCanceled.class);
     assertThat(orderCanceled.data().getOrderId()).isEqualTo(orderId.asUUID());
     assertThat(orderCanceled.data().getCustomerId()).isEqualTo(customerId.asUUID());
-    assertThat(orderCanceled.data().getReason()).isEqualTo("DOA");
+    assertThat(orderCanceled.data().getReason()).isEqualTo("Requested by customer");
   }
 
   @Test
