@@ -88,7 +88,7 @@ public class OrderCommandResourceTest {
     // given
     CancelOrderRequest request = new CancelOrderRequest();
     request.orderId = UUID.randomUUID();
-    request.reason = "DOA";
+    request.reason = "Requested by customer";
 
     OrderId orderId = OrderId.fromUUID(request.orderId);
     CustomerId customerId = CustomerId.newId();
@@ -170,7 +170,7 @@ public class OrderCommandResourceTest {
     // given
     CancelOrderRequest request = new CancelOrderRequest();
     request.orderId = UUID.randomUUID();
-    request.reason = "DOA";
+    request.reason = "Requested by customer";
 
     when(aggregateApiCallback.aggregateLoaded(eq("order"), eq(request.orderId))).thenThrow(new RuntimeException());
 
