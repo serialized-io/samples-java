@@ -13,27 +13,27 @@ git clone git@github.com:serialized-io/samples-java.git
 mvn clean package
 ```
 
-## [aws-event-projector-lambda](https://github.com/serialized-io/samples-java/tree/master/aws-event-projector-lambda)
+## [aws-event-projector-lambda](https://github.com/serialized-io/samples-java/tree/main/aws-event-projector-lambda)
 
 Example how to create a custom projector, deployed as an AWS Lambda, for events stored in Serialized.
 
-## [dropwizard-order-service](https://github.com/serialized-io/samples-java/tree/master/dropwizard-order-service)
+## [dropwizard-order-service](https://github.com/serialized-io/samples-java/tree/main/dropwizard-order-service)
 
 Dropwizard CQRS/EventSourcing backend showing various aspects of the Serialized API:s.
 
-## [dropwizard-guessing-game](https://github.com/serialized-io/samples-java/tree/master/dropwizard-guessing-game)
+## [dropwizard-guessing-game](https://github.com/serialized-io/samples-java/tree/main/dropwizard-guessing-game)
 
 Dropwizard CQRS/EventSourcing backend showing various aspects of the Serialized API:s.
 
-## [event-encryption](https://github.com/serialized-io/samples-java/tree/master/event-encryption)
+## [event-encryption](https://github.com/serialized-io/samples-java/tree/main/event-encryption)
 
 Shows how to utilize client-side encryption before storing events in Serialized.
 
-## [spark-todo-service](https://github.com/serialized-io/samples-java/tree/master/spark-todo-service)
+## [spark-todo-service](https://github.com/serialized-io/samples-java/tree/main/spark-todo-service)
 
 Tiny CQRS/EventSourcing backend showing various aspects of the Serialized API:s.
 
-## [spring-boot-rock-paper-scissors](https://github.com/serialized-io/samples-java/tree/master/spring-boot-rock-paper-scissors)
+## [spring-boot-rock-paper-scissors](https://github.com/serialized-io/samples-java/tree/main/spring-boot-rock-paper-scissors)
 
 Spring Boot CQRS/EventSourcing backend showing various aspects of the Serialized API:s.
 
